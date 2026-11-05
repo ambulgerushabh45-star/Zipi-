@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-ink-50 text-ink-900 font-sans leading-[1.5] antialiased;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display leading-[1.2] tracking-tight;
+  }
+  ::selection {
+    @apply bg-brand-600 text-white;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply bg-white/70 backdrop-blur-xl border border-white/60 shadow-glass;
+  }
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold uppercase tracking-wider text-white shadow-[0_8px_24px_-8px_rgba(10,92,255,0.6)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-700 hover:shadow-[0_14px_30px_-10px_rgba(10,92,255,0.7)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-ink-900/15 bg-white/60 px-6 py-3 text-sm font-semibold uppercase tracking-wider text-ink-900 backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-ink-900 hover:bg-white active:translate-y-0;
+  }
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.25em] text-brand-600;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
