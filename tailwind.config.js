@@ -4,6 +4,15 @@ export default {
   theme: {
     extend: {
       colors: {
+        zipi: {
+          navy: '#07111F',
+          graphite: '#101B2A',
+          cyan: '#00C8FF',
+          orange: '#FF9B42',
+          green: '#67B56B',
+          textPrimary: '#F5F8FC',
+          textSecondary: '#AAB7C7',
+        },
         ink: {
           50: '#f5f6f8',
           100: '#e8eaee',
