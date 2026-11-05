@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, SlidersHorizontal, Sparkles, Eye, Heart, Plus, Layers, X, FileText, Check, } from 'lucide-react';
@@ -33,6 +33,24 @@ export default function ProductsPage({ onOpenShowcase, }) {
     const [quoteModalProduct, setQuoteModalProduct] = useState(null);
     const [compareModalOpen, setCompareModalOpen] = useState(false);
     const [addedItemNotice, setAddedItemNotice] = useState(null);
+
+    // Sync state when URL params change (e.g. from navbar dropdown clicks)
+    useEffect(() => {
+        const cat = searchParams.get('category');
+        if (cat) {
+            setSelectedCategory(cat);
+        }
+        const q = searchParams.get('q');
+        if (q !== null) {
+            setSearchQuery(q);
+        }
+        const filter = searchParams.get('filter');
+        if (filter === 'new') {
+            setSortBy('new');
+        } else if (filter === 'featured') {
+            setSortBy('featured');
+        }
+    }, [searchParams]);
     // Filtered and Sorted Products across all 4 hardware categories
     const filteredProducts = useMemo(() => {
         return PRODUCTS.filter((p) => {
@@ -93,6 +111,8 @@ export default function ProductsPage({ onOpenShowcase, }) {
                 return b.price - a.price;
             if (sortBy === 'rating')
                 return b.rating - a.rating;
+            if (sortBy === 'new')
+                return (b.badge === 'New' || b.badge === 'Flagship Fleet' ? 1 : 0) - (a.badge === 'New' || a.badge === 'Flagship Fleet' ? 1 : 0);
             return 0; // featured default order
         });
     }, [selectedCategory, searchQuery, sortBy]);

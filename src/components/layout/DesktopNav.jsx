@@ -13,18 +13,19 @@ export default function DesktopNav({ items, activeId, onHover, onOpen, onClose }
         if (item.menu) {
           const isActive = activeId === item.id;
           return (
-            <button
+            <Link
               key={item.id}
-              type="button"
+              to={item.to}
               aria-expanded={isActive}
               aria-controls="mega-menu"
               onMouseEnter={() => onHover(item.id)}
               onFocus={() => onOpen(item.id)}
-              onClick={() => (isActive ? onClose() : onOpen(item.id))}
+              onClick={() => onClose()}
               onKeyDown={(e) => {
-                if (e.key !== 'ArrowDown') return;
-                e.preventDefault();
-                document.getElementById('mega-menu')?.querySelector('a')?.focus();
+                if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  document.getElementById('mega-menu')?.querySelector('a')?.focus();
+                }
               }}
               className={`relative inline-flex items-center gap-1 rounded-full px-3.5 py-2 text-xs font-semibold uppercase tracking-wider transition-colors duration-300 outline-none focus-visible:ring-2 focus-visible:ring-[#00C8FF] ${
                 isCurrentRoute || isActive
@@ -45,7 +46,7 @@ export default function DesktopNav({ items, activeId, onHover, onOpen, onClose }
                   transition={{ type: 'spring', stiffness: 420, damping: 36 }}
                 />
               )}
-            </button>
+            </Link>
           );
         }
 

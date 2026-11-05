@@ -29,10 +29,12 @@ const imageVariants = {
   hover: { scale: 1.05, transition: { duration: 0.8, ease: EASE } },
 };
 
-export default function MegaMenuPanel({ id, menu, onNavigate }) {
+export default function MegaMenuPanel({ id, menu, onNavigate, onMouseEnter, onMouseLeave }) {
   return (
     <motion.div
       id="mega-menu"
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       initial={{ opacity: 0, y: -12 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}

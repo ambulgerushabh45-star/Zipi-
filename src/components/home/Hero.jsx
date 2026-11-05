@@ -110,7 +110,7 @@ export default function Hero({ onOpenShowcase }) {
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative isolate min-h-[100svh] w-full overflow-hidden bg-[#07111F] text-[#F5F8FC] pt-24 pb-12 flex flex-col justify-center select-none"
+      className="relative isolate min-h-[92svh] w-full overflow-hidden bg-[#07111F] text-[#F5F8FC] pt-24 pb-8 sm:pb-12 flex flex-col justify-center select-none"
     >
       {/* ==============================================================
           STEP 1 – DARK ATMOSPHERIC BACKGROUND FADES IN
@@ -132,6 +132,23 @@ export default function Hero({ onOpenShowcase }) {
         {/* Subtle Cyan and Warm Ambient Lighting Reflections */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_45%,rgba(0,200,255,0.18)_0,rgba(16,27,42,0.6)_45%,transparent_75%)]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(0,200,255,0.08)_0,transparent_55%)]" />
+
+        {/* Subtle Atmospheric Flight Particles */}
+        <div className="absolute inset-0 pointer-events-none opacity-40">
+          {[...Array(18)].map((_, i) => (
+            <div
+              key={i}
+              className="absolute h-1 w-1 rounded-full bg-[#00C8FF] animate-pulse"
+              style={{
+                top: `${(i * 17) % 92}%`,
+                left: `${(i * 21 + 5) % 95}%`,
+                opacity: 0.2 + (i % 5) * 0.14,
+                animationDuration: `${2.4 + (i % 4) * 0.8}s`,
+                animationDelay: `${(i % 4) * 0.6}s`,
+              }}
+            />
+          ))}
+        </div>
       </motion.div>
 
       {/* Subtle Aerospace Flight HUD Details */}
@@ -164,7 +181,7 @@ export default function Hero({ onOpenShowcase }) {
           {/* ==========================================================
               LEFT SIDE: BRANDING, HEADLINE, SUPPORTING TEXT, BUTTONS
               ========================================================== */}
-          <div className="lg:col-span-6 xl:col-span-6 flex flex-col items-start text-left z-20">
+          <div className="lg:col-span-5 xl:col-span-5 flex flex-col items-start text-left z-20">
             {/* STEP 2 – ZIPI LOGO REVEALS SMOOTHLY */}
             <motion.div
               variants={logoVariants}
@@ -226,10 +243,10 @@ export default function Hero({ onOpenShowcase }) {
               animate="visible"
               className="mt-8 flex flex-wrap items-center gap-4"
             >
-              {/* BUTTON 1: EXPLORE PRODUCTS */}
+              {/* BUTTON 1: EXPLORE PRODUCTS (Warm Orange #FF9B42 CTA) */}
               <Link
                 to="/products"
-                className="group relative inline-flex items-center gap-2.5 rounded-xl bg-[#00C8FF] px-7 py-3.5 text-xs sm:text-sm font-bold uppercase tracking-wider text-[#07111F] shadow-[0_0_28px_rgba(0,200,255,0.5)] transition-all duration-300 hover:bg-cyan-300 hover:scale-105"
+                className="group relative inline-flex items-center gap-2.5 rounded-xl bg-[#FF9B42] px-7 py-3.5 text-xs sm:text-sm font-black uppercase tracking-wider text-[#07111F] shadow-[0_0_28px_rgba(255,155,66,0.6)] transition-all duration-300 hover:bg-[#ffaa5c] hover:shadow-[0_0_36px_rgba(255,155,66,0.85)] hover:scale-105"
               >
                 <span>Explore Products</span>
                 <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -288,9 +305,9 @@ export default function Hero({ onOpenShowcase }) {
 
           {/* ==========================================================
               RIGHT SIDE: LARGE REALISTIC DRONE (CENTERPIECE)
-              Complete drone clearly visible, realistic lighting, shadows & depth
+              Occupy 50-60% of desktop visual area, clearly visible, realistic lighting
               ========================================================== */}
-          <div className="lg:col-span-6 xl:col-span-6 relative flex flex-col items-center justify-center min-h-[380px] sm:min-h-[460px] lg:min-h-[580px] z-10">
+          <div className="lg:col-span-7 xl:col-span-7 relative flex flex-col items-center justify-center min-h-[420px] sm:min-h-[500px] lg:min-h-[640px] z-10">
             {/* STEP 3 & 4 – DRONE ENTRANCE:
                 Enters from right, initially farther away, scales into final position */}
             <motion.div
@@ -309,7 +326,7 @@ export default function Hero({ onOpenShowcase }) {
               {/* Subtle Cyan Technical HUD Elements around drone */}
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center -z-10">
                 {/* Rotating range circle with compass bearings */}
-                <div className="relative h-72 w-72 sm:h-96 sm:w-96 rounded-full border border-[#00C8FF]/20 animate-spin-slow">
+                <div className="relative h-80 w-80 sm:h-[450px] sm:w-[450px] lg:h-[540px] lg:w-[540px] rounded-full border border-[#00C8FF]/20 animate-spin-slow">
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[#00C8FF] font-mono text-[9px]">
                     ▲ N 000°
                   </div>
@@ -325,21 +342,21 @@ export default function Hero({ onOpenShowcase }) {
                 </div>
 
                 {/* Inner reticle target */}
-                <div className="absolute h-48 w-48 sm:h-64 sm:w-64 rounded-full border border-dashed border-[#00C8FF]/20" />
+                <div className="absolute h-56 w-56 sm:h-72 sm:w-72 lg:h-96 lg:w-96 rounded-full border border-dashed border-[#00C8FF]/25" />
                 <div className="absolute flex items-center justify-center text-[#00C8FF]/30">
-                  <Crosshair className="h-20 w-20 stroke-[1]" />
+                  <Crosshair className="h-24 w-24 stroke-[1]" />
                 </div>
               </div>
 
               {/* Cyan Rim Lighting Halo & Atmospheric Glow */}
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,200,255,0.25)_0,rgba(0,200,255,0.06)_45%,transparent_75%)] blur-2xl -z-10" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,200,255,0.28)_0,rgba(0,200,255,0.08)_45%,transparent_75%)] blur-2xl -z-10" />
 
-              {/* THE LARGE REALISTIC DRONE IMAGE */}
+              {/* THE LARGE REALISTIC DRONE IMAGE (Dominant 50-60% Visual Area) */}
               <div className="relative w-full flex items-center justify-center animate-float">
                 <img
                   src="/images/drones/hero-flagship.png"
                   alt="ZIPI Aegis Sentinel MK-IV Flagship Drone"
-                  className="w-full max-w-[620px] lg:max-w-[700px] xl:max-w-[760px] object-contain select-none filter drop-shadow-[0_30px_60px_rgba(0,200,255,0.4)] drop-shadow-[0_0_25px_rgba(0,200,255,0.25)] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                  className="w-full max-w-[680px] sm:max-w-[780px] lg:max-w-[880px] xl:max-w-[980px] 2xl:max-w-[1080px] object-contain select-none filter drop-shadow-[0_30px_70px_rgba(0,200,255,0.45)] drop-shadow-[0_0_35px_rgba(0,200,255,0.3)] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
                 />
 
                 {/* Subtle Interactive Telemetry Badges */}

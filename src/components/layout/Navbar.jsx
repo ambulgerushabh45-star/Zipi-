@@ -114,6 +114,8 @@ export default function Navbar({ onOpenCart }) {
               id={activeItem.id}
               menu={activeMenu}
               onNavigate={close}
+              onMouseEnter={enterArea}
+              onMouseLeave={leaveArea}
             />
           )}
         </AnimatePresence>
