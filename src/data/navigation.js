@@ -10,13 +10,13 @@ export const NAV_ITEMS = [
     to: '/products',
     menu: {
       eyebrow: 'Direct Hardware Procurement',
-      title: 'Aerospace E-Commerce Store',
+      title: 'Drone Systems Store',
       links: [
         {
-          label: 'All Products',
+          label: 'View All Products',
           to: '/products',
           tagline: 'Explore our full certified inventory of UAVs, controllers & ground systems',
-          badge: 'Catalogue',
+          badge: 'View All',
         },
         {
           label: 'New Arrivals',
@@ -27,8 +27,14 @@ export const NAV_ITEMS = [
         {
           label: 'Featured Products',
           to: '/products?filter=featured',
-          tagline: 'Flagship combat-proven defence systems and precision agricultural sprayers',
+          tagline: 'Flagship non-weaponized ISR defence systems and precision agricultural sprayers',
           badge: 'Flagship',
+        },
+        {
+          label: 'Controller Finder & Matrix',
+          to: '/controllers',
+          tagline: 'Match handheld & swarm controllers to your drone platform and mission',
+          badge: 'Interactive',
         },
       ],
       promo: {
@@ -56,18 +62,24 @@ export const NAV_ITEMS = [
     label: 'Products',
     to: '/products',
     menu: {
-      eyebrow: 'Aerospace Systems Catalogue',
-      title: 'Complete Autonomous UAV Hardware Architecture',
+      eyebrow: 'Drone Systems Catalogue',
+      title: 'Complete Autonomous UAV & Control Architecture',
       links: [
+        {
+          label: 'View All Products',
+          to: '/products',
+          tagline: 'Browse every certified ZIPI airframe, controller, station & module',
+          badge: 'View All',
+        },
         {
           label: 'UAV Drones',
           to: '/products?category=uav-drones',
-          tagline: 'High-endurance tactical defence, precision ag & commercial airframes',
+          tagline: 'High-endurance non-weaponized ISR, precision ag & commercial airframes',
           badge: 'Airborne Fleet',
         },
         {
-          label: 'UAV Remote Controllers',
-          to: '/products?category=controllers',
+          label: 'Remote Controllers',
+          to: '/controllers',
           tagline: '2,000-nit daylight screens, long-range COFDM & multi-UAV commanders',
           badge: 'C2 Control',
         },
@@ -82,6 +94,12 @@ export const NAV_ITEMS = [
           to: '/products?category=avionics',
           tagline: 'AES-256 tactical IP mesh radios, micro-datalinks & LEO satellite telemetry',
           badge: 'Intelligence',
+        },
+        {
+          label: 'Accessories',
+          to: '/accessories?category=accessories',
+          tagline: 'High-cycle smart battery hubs, carbon rotors & modular mission accessories',
+          badge: 'Modules',
         },
       ],
       promo: {
@@ -108,10 +126,10 @@ export const NAV_ITEMS = [
       title: 'Engineering & Client Operations',
       links: [
         {
-          label: 'Contact Us',
+          label: 'View All — Contact / Enquiry',
           to: '/contact',
-          tagline: 'Connect directly with our aerospace engineers and commercial sales specialists',
-          badge: 'Direct Line',
+          tagline: 'Connect with ZIPI supervisors for orders, partnerships, RFPs & support',
+          badge: 'View All',
         },
         {
           label: 'FAQs',
@@ -128,7 +146,7 @@ export const NAV_ITEMS = [
       ],
       promo: {
         eyebrow: 'Operations Center',
-        headline: 'Dedicated Aerospace Support Team Standing By Around the Clock.',
+        headline: 'Dedicated ZIPI Drones & Controls Support Team Standing By.',
         image: 'https://images.pexels.com/photos/1779487/pexels-photo-1779487.jpeg?auto=compress&cs=tinysrgb&w=1000',
         imageAlt: 'Mission control center monitoring drone telemetry',
         to: '/contact',

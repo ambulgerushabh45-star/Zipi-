@@ -1,100 +1,63 @@
-import { useState, useRef } from 'react';
-import { motion, useScroll, useTransform, useMotionValue, useSpring, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Play, Crosshair, Sparkles, X, Shield, Radio, Layers, Activity } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useScroll,
+  useSpring,
+  useTransform,
+} from 'framer-motion';
+import {
+  Activity,
+  ChevronDown,
+  Crosshair,
+  Layers,
+  Play,
+  Radio,
+  Shield,
+  Sparkles,
+  X,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Magnetic } from '@/components/motion';
 
-// High-resolution cinematic aerospace airfield backdrop
 const HERO_BG =
   'https://images.pexels.com/photos/17854251/pexels-photo-17854251.jpeg?auto=compress&cs=tinysrgb&w=2560';
 
-// Choreographed 7-Step Opening Sequence Variants
-const backgroundVariants = {
-  hidden: { opacity: 0, scale: 1.08 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] },
-  },
-};
-
-const logoVariants = {
-  hidden: { opacity: 0, y: -16 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, delay: 0.25, ease: [0.22, 1, 0.36, 1] },
-  },
-};
-
-const droneEntranceVariants = {
-  hidden: {
-    opacity: 0,
-    x: 140,
-    scale: 0.65,
-    filter: 'blur(10px)',
-  },
-  visible: {
-    opacity: 1,
-    x: 0,
-    scale: 1,
-    filter: 'blur(0px)',
-    transition: {
-      duration: 1.4,
-      delay: 0.35,
-      ease: [0.16, 1, 0.3, 1],
-    },
-  },
-};
-
-const headlineLineVariants = {
-  hidden: { opacity: 0, y: 32 },
-  visible: (i) => ({
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.8,
-      delay: 0.55 + i * 0.18,
-      ease: [0.22, 1, 0.36, 1],
-    },
-  }),
-};
-
-const contentVariants = {
-  hidden: { opacity: 0, y: 22 },
-  visible: (delay) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] },
-  }),
-};
-
-const techBadgeVariants = {
-  hidden: { opacity: 0, scale: 0.85 },
-  visible: (i) => ({
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.5, delay: 1.1 + i * 0.1, ease: 'easeOut' },
-  }),
-};
+const HEADLINE_WORDS = [
+  { text: 'Engineered', accent: false },
+  { text: 'to', accent: false },
+  { text: 'Fly.', accent: true },
+  { text: 'Built', accent: false },
+  { text: 'to', accent: false },
+  { text: 'Serve.', accent: true },
+];
 
 export default function Hero({ onOpenShowcase }) {
   const containerRef = useRef(null);
   const [demoModalOpen, setDemoModalOpen] = useState(false);
+  const [isTouch, setIsTouch] = useState(false);
+  const shouldReduceMotion = useReducedMotion();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.matchMedia) {
+      setIsTouch(window.matchMedia('(pointer: coarse)').matches);
+    }
+  }, []);
 
   const { scrollY } = useScroll();
-  const bgY = useTransform(scrollY, [0, 800], [0, 160]);
-  const contentY = useTransform(scrollY, [0, 600], [0, 60]);
-  const opacity = useTransform(scrollY, [0, 500], [1, 0.15]);
+  const bgY = useTransform(scrollY, [0, 800], shouldReduceMotion ? [0, 0] : [0, 120]);
 
-  // Pointer-based 3D Parallax & Depth Tilt on Drone
   const mouseX = useMotionValue(0.5);
   const mouseY = useMotionValue(0.5);
-  const rotateX = useSpring(useTransform(mouseY, [0, 1], [8, -8]), { stiffness: 120, damping: 20 });
-  const rotateY = useSpring(useTransform(mouseX, [0, 1], [-12, 12]), { stiffness: 120, damping: 20 });
-  const droneFloatY = useSpring(useTransform(mouseY, [0, 1], [-10, 10]), { stiffness: 100, damping: 18 });
+  const rotateX = useSpring(useTransform(mouseY, [0, 1], [6, -6]), { stiffness: 120, damping: 20 });
+  const rotateY = useSpring(useTransform(mouseX, [0, 1], [-9, 9]), { stiffness: 120, damping: 20 });
+  const droneShiftX = useSpring(useTransform(mouseX, [0, 1], [-14, 14]), { stiffness: 110, damping: 20 });
+  const droneShiftY = useSpring(useTransform(mouseY, [0, 1], [-10, 10]), { stiffness: 110, damping: 20 });
 
   const handleMouseMove = (e) => {
-    if (!containerRef.current) return;
+    if (shouldReduceMotion || isTouch || !containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     mouseX.set((e.clientX - rect.left) / rect.width);
     mouseY.set((e.clientY - rect.top) / rect.height);
@@ -110,284 +73,270 @@ export default function Hero({ onOpenShowcase }) {
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative isolate min-h-[92svh] w-full overflow-hidden bg-[#07111F] text-[#F5F8FC] pt-24 pb-8 sm:pb-12 flex flex-col justify-center select-none"
+      className="relative isolate min-h-[94svh] w-full overflow-hidden bg-[#050b14] text-[#f1f5f9] pt-24 pb-10 flex flex-col justify-center select-none"
     >
-      {/* ==============================================================
-          STEP 1 – DARK ATMOSPHERIC BACKGROUND FADES IN
-          ============================================================== */}
+      {/* Background Imagery + Parallax */}
       <motion.div
-        variants={backgroundVariants}
-        initial="hidden"
-        animate="visible"
-        style={{ y: bgY }}
-        className="absolute inset-0 -z-30 h-[125%]"
+        style={shouldReduceMotion ? undefined : { y: bgY }}
+        className="pointer-events-none absolute inset-0 -z-30 h-[120%]"
       >
         <img
           src={HERO_BG}
-          alt="ZIPI Aerospace Airfield"
-          className="h-full w-full object-cover object-center opacity-30 filter brightness-70 contrast-125"
+          alt="ZIPI Drones & Controls flight airfield"
+          className="h-full w-full object-cover object-center opacity-20 brightness-75 contrast-125"
         />
-        {/* Layered Midnight Navy to Deep Graphite Gradients */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#07111F] via-[#07111F]/80 to-[#07111F]" />
-        {/* Subtle Cyan and Warm Ambient Lighting Reflections */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_45%,rgba(0,200,255,0.18)_0,rgba(16,27,42,0.6)_45%,transparent_75%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_25%,rgba(0,200,255,0.08)_0,transparent_55%)]" />
-
-        {/* Subtle Atmospheric Flight Particles */}
-        <div className="absolute inset-0 pointer-events-none opacity-40">
-          {[...Array(18)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute h-1 w-1 rounded-full bg-[#00C8FF] animate-pulse"
-              style={{
-                top: `${(i * 17) % 92}%`,
-                left: `${(i * 21 + 5) % 95}%`,
-                opacity: 0.2 + (i % 5) * 0.14,
-                animationDuration: `${2.4 + (i % 4) * 0.8}s`,
-                animationDelay: `${(i % 4) * 0.6}s`,
-              }}
-            />
-          ))}
-        </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050b14] via-[#050b14]/85 to-[#050b14]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_70%_45%,rgba(34,211,238,0.16)_0,rgba(11,26,44,0.6)_45%,transparent_75%)]" />
       </motion.div>
 
-      {/* Subtle Aerospace Flight HUD Details */}
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden opacity-30">
-        <div className="absolute left-6 sm:left-12 top-28 flex flex-col font-mono text-[10px] tracking-widest text-[#00C8FF]">
-          <span className="flex items-center gap-1.5">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#00C8FF] animate-pulse" />
-            SYS.STATUS // AIRSPACE CLEARED
-          </span>
-          <span>LAT: 37°48&apos;N // LON: 122°24&apos;W</span>
-          <span>360° SPHERICAL RADAR: ACTIVE</span>
-        </div>
-        <div className="absolute right-6 sm:right-12 top-28 hidden sm:flex flex-col text-right font-mono text-[10px] tracking-widest text-[#00C8FF]">
-          <span>C2 LINK: AES-256 ENCRYPTED</span>
-          <span>ALTITUDE: 2,400M ASL</span>
-          <span>TELEMETRY: OPTIMAL // 0.02ms</span>
-        </div>
-      </div>
+      {/* Faint 48px Mission Grid Overlay */}
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-20 hero-grid-overlay" />
 
-      {/* ==============================================================
-          MAIN CONTAINER: SPLIT-SCREEN LAYOUT
-          LEFT: Headline, supporting text, sequential buttons
-          RIGHT: Prominently positioned large realistic drone (never hidden)
-          ============================================================== */}
-      <motion.div
-        style={{ y: contentY, opacity }}
-        className="relative mx-auto w-full max-w-7xl px-5 sm:px-8 py-8 flex-1 flex flex-col justify-center"
+      {/* Looping SVG Flight Path */}
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 1200 500"
+        fill="none"
+        className="pointer-events-none absolute inset-0 -z-10 h-full w-full opacity-35"
+        preserveAspectRatio="none"
       >
+        <motion.path
+          d="M-40 380 C 220 260, 440 440, 720 220 C 900 80, 1080 180, 1240 90"
+          stroke="url(#flightGrad)"
+          strokeWidth="2"
+          strokeDasharray="6 6"
+          initial={shouldReduceMotion ? false : { pathLength: 0, opacity: 0.25 }}
+          animate={
+            shouldReduceMotion
+              ? { pathLength: 1, opacity: 0.45 }
+              : { pathLength: [0, 1, 1], opacity: [0.25, 0.85, 0.25] }
+          }
+          transition={{ duration: 5.5, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <defs>
+          <linearGradient id="flightGrad" x1="0" y1="0" x2="1200" y2="0" gradientUnits="userSpaceOnUse">
+            <stop stopColor="#22d3ee" />
+            <stop offset="1" stopColor="#0ea5e9" />
+          </linearGradient>
+        </defs>
+      </svg>
+
+      {/* Main Container */}
+      <div className="relative mx-auto w-full max-w-7xl px-5 sm:px-8 py-6 flex-1 flex flex-col justify-center">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
-          {/* ==========================================================
-              LEFT SIDE: BRANDING, HEADLINE, SUPPORTING TEXT, BUTTONS
-              ========================================================== */}
-          <div className="lg:col-span-5 xl:col-span-5 flex flex-col items-start text-left z-20">
-            {/* STEP 2 – ZIPI LOGO REVEALS SMOOTHLY */}
+          {/* Left Column */}
+          <div className="lg:col-span-6 flex flex-col items-start text-left z-20">
             <motion.div
-              variants={logoVariants}
-              initial="hidden"
-              animate="visible"
-              className="inline-flex items-center gap-2.5 rounded-full border border-[#00C8FF]/40 bg-[#101B2A]/80 px-3.5 py-1.5 backdrop-blur-md shadow-[0_0_20px_rgba(0,200,255,0.15)]"
+              initial={shouldReduceMotion ? false : { opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: shouldReduceMotion ? 0 : 0.35 }}
+              className="inline-flex items-center gap-2.5 rounded-full border border-cyan-400/35 bg-[#0b1a2c]/90 px-3.5 py-1.5 backdrop-blur-md"
             >
               <img
                 src="/images/zipi-crest.png"
                 alt="ZIPI Crest"
-                className="h-4 w-4 object-contain filter drop-shadow-[0_0_6px_rgba(0,200,255,0.8)]"
+                className="h-4 w-4 object-contain"
               />
-              <span className="font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.25em] text-[#00C8FF]">
-                ZIPI AEROSPACE // AUTONOMOUS UAV
+              <span className="font-mono text-[10px] sm:text-[11px] font-bold uppercase tracking-[0.22em] text-cyan-300">
+                ZIPI DRONES &amp; CONTROLS // MISSION READY
               </span>
             </motion.div>
 
-            {/* STEP 5 – HEADLINE REVEALS LINE BY LINE */}
-            <div className="mt-5 sm:mt-6">
-              <h1 className="font-display font-black tracking-tight leading-[1.0] text-5xl sm:text-7xl md:text-7xl lg:text-7xl xl:text-[5.25rem]">
-                <motion.span
-                  custom={0}
-                  variants={headlineLineVariants}
-                  initial="hidden"
-                  animate="visible"
-                  className="block text-[#F5F8FC]"
-                >
-                  FLY BEYOND
-                </motion.span>
-                <motion.span
-                  custom={1}
-                  variants={headlineLineVariants}
-                  initial="hidden"
-                  animate="visible"
-                  className="block text-transparent bg-clip-text bg-gradient-to-r from-[#00C8FF] via-cyan-200 to-[#F5F8FC] filter drop-shadow-[0_0_35px_rgba(0,200,255,0.4)]"
-                >
-                  LIMITS.
-                </motion.span>
-              </h1>
-            </div>
+            {/* Word-by-word slide-up headline */}
+            <h1 className="mt-6 font-display text-4xl sm:text-6xl xl:text-7xl font-extrabold tracking-tight leading-[1.06]">
+              <span className="flex flex-wrap gap-x-3.5 gap-y-1">
+                {HEADLINE_WORDS.slice(0, 3).map((word, i) => (
+                  <span key={word.text} className="inline-block overflow-hidden">
+                    <motion.span
+                      initial={shouldReduceMotion ? false : { y: 36, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{
+                        duration: shouldReduceMotion ? 0 : 0.36,
+                        delay: shouldReduceMotion ? 0 : i * 0.06,
+                        ease: [0.22, 1, 0.36, 1],
+                      }}
+                      className={`inline-block ${
+                        word.accent
+                          ? 'bg-gradient-to-r from-[#22d3ee] to-[#0ea5e9] bg-clip-text text-transparent'
+                          : 'text-[#f1f5f9]'
+                      }`}
+                    >
+                      {word.text}
+                    </motion.span>
+                  </span>
+                ))}
+              </span>
+              <span className="mt-1 flex flex-wrap gap-x-3.5 gap-y-1">
+                {HEADLINE_WORDS.slice(3).map((word, i) => (
+                  <span key={word.text} className="inline-block overflow-hidden">
+                    <motion.span
+                      initial={shouldReduceMotion ? false : { y: 36, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{
+                        duration: shouldReduceMotion ? 0 : 0.36,
+                        delay: shouldReduceMotion ? 0 : (i + 3) * 0.06,
+                        ease: [0.22, 1, 0.36, 1],
+                      }}
+                      className={`inline-block ${
+                        word.accent
+                          ? 'bg-gradient-to-r from-[#22d3ee] to-[#0ea5e9] bg-clip-text text-transparent'
+                          : 'text-[#f1f5f9]'
+                      }`}
+                    >
+                      {word.text}
+                    </motion.span>
+                  </span>
+                ))}
+              </span>
+            </h1>
 
-            {/* STEP 6 – SUPPORTING TEXT AND BUTTONS APPEAR SEQUENTIALLY */}
             <motion.p
-              custom={0.9}
-              variants={contentVariants}
-              initial="hidden"
-              animate="visible"
-              className="mt-5 sm:mt-6 max-w-xl text-lg sm:text-xl font-normal leading-relaxed text-[#AAB7C7]"
+              initial={shouldReduceMotion ? false : { opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: shouldReduceMotion ? 0 : 0.35, delay: shouldReduceMotion ? 0 : 0.2 }}
+              className="mt-5 max-w-xl text-base sm:text-lg leading-relaxed text-[#94a3b8]"
             >
-              Advanced Drones. Intelligent Systems.
-              <span className="block text-[#F5F8FC] font-medium mt-1">A Smarter Tomorrow.</span>
+              Autonomous UAV platforms, daylight remote controllers, and IP67 ground control stations engineered exclusively for non-weaponized ISR, search-and-rescue, and precision agriculture.
             </motion.p>
 
-            {/* TWO PROMINENT BUTTONS: EXPLORE PRODUCTS & WATCH DEMO */}
-            <motion.div
-              custom={1.05}
-              variants={contentVariants}
-              initial="hidden"
-              animate="visible"
-              className="mt-8 flex flex-wrap items-center gap-4"
-            >
-              {/* BUTTON 1: EXPLORE PRODUCTS (Warm Orange #FF9B42 CTA) */}
-              <Link
-                to="/products"
-                className="group relative inline-flex items-center gap-2.5 rounded-xl bg-[#FF9B42] px-7 py-3.5 text-xs sm:text-sm font-black uppercase tracking-wider text-[#07111F] shadow-[0_0_28px_rgba(255,155,66,0.6)] transition-all duration-300 hover:bg-[#ffaa5c] hover:shadow-[0_0_36px_rgba(255,155,66,0.85)] hover:scale-105"
-              >
-                <span>Explore Products</span>
-                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-              </Link>
+            {/* Primary Magnetic CTAs */}
+            <div className="mt-8 flex flex-wrap items-center gap-3.5">
+              <Magnetic>
+                <Link to="/products" className="btn-mission-primary min-h-[48px]">
+                  <span>Shop hardware</span>
+                </Link>
+              </Magnetic>
 
-              {/* BUTTON 2: WATCH DEMO */}
+              <Magnetic strength={5}>
+                <Link to="/contact" className="btn-mission-ghost min-h-[48px]">
+                  <span>Talk to our team</span>
+                </Link>
+              </Magnetic>
+
               <button
+                type="button"
                 onClick={() => setDemoModalOpen(true)}
-                className="group inline-flex items-center gap-2.5 rounded-xl border border-[#AAB7C7]/30 bg-[#101B2A]/80 px-6 py-3.5 text-xs sm:text-sm font-semibold uppercase tracking-wider text-[#F5F8FC] backdrop-blur transition-all duration-300 hover:border-[#00C8FF] hover:bg-[#101B2A] hover:text-[#00C8FF]"
+                className="inline-flex min-h-[48px] items-center gap-2 rounded-xl border border-white/10 bg-[#08121f]/80 px-4 py-2.5 text-xs font-mono uppercase tracking-wider text-cyan-300 hover:border-cyan-400/50 transition outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
               >
-                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-[#00C8FF]/20 text-[#00C8FF] group-hover:bg-[#00C8FF] group-hover:text-[#07111F] transition-colors">
-                  <Play className="h-2.5 w-2.5 fill-current ml-0.5" />
-                </div>
-                <span>Watch Demo</span>
+                <Play className="h-3.5 w-3.5 fill-current" />
+                <span>Flight Reel</span>
               </button>
+            </div>
 
-              {/* Showcase Shortcut */}
-              <button
-                onClick={() => onOpenShowcase && onOpenShowcase('aegis-mk4')}
-                className="inline-flex items-center gap-2 rounded-xl border border-[#00C8FF]/30 bg-[#101B2A]/50 px-4 py-3.5 text-xs font-mono uppercase tracking-wider text-[#00C8FF] hover:bg-[#101B2A] hover:border-[#00C8FF] transition-all"
-                title="Launch 3D Cinematic Showcase"
-              >
-                <Sparkles className="h-3.5 w-3.5 text-[#00C8FF]" />
-                <span className="hidden sm:inline">3D Showcase</span>
-              </button>
-            </motion.div>
-
-            {/* STEP 7 – SMALL TECHNICAL ELEMENTS REVEAL WITH SUBTLE DELAYS */}
-            <div className="mt-8 sm:mt-10 grid grid-cols-2 sm:grid-cols-4 gap-3 w-full max-w-xl border-t border-[#101B2A] pt-5">
+            {/* Key Architecture Highlights */}
+            <div className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 w-full max-w-xl border-t border-white/10 pt-5">
               {[
-                { label: 'Tactical ISR', sub: 'Non-Weaponized', icon: Shield, col: 'text-[#00C8FF]' },
-                { label: 'Precision Agri', sub: '40L Variable Rate', icon: Activity, col: 'text-[#67B56B]' },
-                { label: 'Encrypted C2', sub: 'AES-256 Link', icon: Radio, col: 'text-[#00C8FF]' },
-                { label: 'Autonomous', sub: 'Sub-Cm RTK', icon: Layers, col: 'text-[#FF9B42]' },
-              ].map((item, idx) => {
+                { label: 'Defence ISR', sub: 'Non-Weaponized', icon: Shield, col: 'text-[#60a5fa]' },
+                { label: 'Precision Ag', sub: 'NDVI & 40L Spray', icon: Activity, col: 'text-[#4ade80]' },
+                { label: 'Encrypted C2', sub: 'AES-256 Links', icon: Radio, col: 'text-cyan-300' },
+                { label: 'Autonomous', sub: 'Sub-Cm RTK', icon: Layers, col: 'text-[#fbbf24]' },
+              ].map((item) => {
                 const IconComp = item.icon;
                 return (
-                  <motion.div
-                    key={item.label}
-                    custom={idx}
-                    variants={techBadgeVariants}
-                    initial="hidden"
-                    animate="visible"
-                    className="flex flex-col border-l border-[#101B2A] pl-3"
-                  >
+                  <div key={item.label} className="border-l border-white/10 pl-3">
                     <div className="flex items-center gap-1.5">
                       <IconComp className={`h-3.5 w-3.5 ${item.col}`} />
-                      <span className="font-mono text-xs font-bold text-[#F5F8FC]">{item.label}</span>
+                      <span className="font-mono text-xs font-bold text-[#f1f5f9]">{item.label}</span>
                     </div>
-                    <span className="text-[10px] text-[#AAB7C7] font-mono mt-0.5">{item.sub}</span>
-                  </motion.div>
+                    <span className="text-[10px] text-[#94a3b8] font-mono mt-0.5 block">
+                      {item.sub}
+                    </span>
+                  </div>
                 );
               })}
             </div>
           </div>
 
-          {/* ==========================================================
-              RIGHT SIDE: LARGE REALISTIC DRONE (CENTERPIECE)
-              Occupy 50-60% of desktop visual area, clearly visible, realistic lighting
-              ========================================================== */}
-          <div className="lg:col-span-7 xl:col-span-7 relative flex flex-col items-center justify-center min-h-[420px] sm:min-h-[500px] lg:min-h-[640px] z-10">
-            {/* STEP 3 & 4 – DRONE ENTRANCE:
-                Enters from right, initially farther away, scales into final position */}
+          {/* Right Column: Interactive Parallax Drone + Radar Rings */}
+          <div className="lg:col-span-6 relative flex flex-col items-center justify-center min-h-[340px] sm:min-h-[460px] z-10">
             <motion.div
-              variants={droneEntranceVariants}
-              initial="hidden"
-              animate="visible"
-              style={{
-                rotateX,
-                rotateY,
-                y: droneFloatY,
-                transformStyle: 'preserve-3d',
-              }}
+              style={
+                shouldReduceMotion || isTouch
+                  ? undefined
+                  : { rotateX, rotateY, x: droneShiftX, y: droneShiftY, transformStyle: 'preserve-3d' }
+              }
               className="relative w-full flex flex-col items-center justify-center cursor-pointer group"
-              onClick={() => onOpenShowcase && onOpenShowcase('aegis-mk4')}
+              onClick={() => onOpenShowcase?.('aegis-mk4')}
             >
-              {/* Subtle Cyan Technical HUD Elements around drone */}
+              {/* Glowing Radar Rings */}
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center -z-10">
-                {/* Rotating range circle with compass bearings */}
-                <div className="relative h-80 w-80 sm:h-[450px] sm:w-[450px] lg:h-[540px] lg:w-[540px] rounded-full border border-[#00C8FF]/20 animate-spin-slow">
-                  <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 text-[#00C8FF] font-mono text-[9px]">
-                    ▲ N 000°
-                  </div>
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 text-[#00C8FF] font-mono text-[9px]">
-                    ▼ S 180°
-                  </div>
-                  <div className="absolute top-1/2 left-0 -translate-x-1/2 -translate-y-1/2 text-[#00C8FF] font-mono text-[9px]">
-                    ◀ W 270°
-                  </div>
-                  <div className="absolute top-1/2 right-0 translate-x-1/2 -translate-y-1/2 text-[#00C8FF] font-mono text-[9px]">
-                    ▶ E 090°
-                  </div>
+                <div
+                  className={`relative h-72 w-72 sm:h-[420px] sm:w-[420px] rounded-full border border-cyan-400/20 ${
+                    shouldReduceMotion ? '' : 'animate-spin-slow'
+                  }`}
+                >
+                  <span className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 text-cyan-300 font-mono text-[9px]">
+                    N 000°
+                  </span>
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 text-cyan-300 font-mono text-[9px]">
+                    S 180°
+                  </span>
                 </div>
-
-                {/* Inner reticle target */}
-                <div className="absolute h-56 w-56 sm:h-72 sm:w-72 lg:h-96 lg:w-96 rounded-full border border-dashed border-[#00C8FF]/25" />
-                <div className="absolute flex items-center justify-center text-[#00C8FF]/30">
-                  <Crosshair className="h-24 w-24 stroke-[1]" />
-                </div>
+                <div className="absolute h-52 w-52 sm:h-72 sm:w-72 rounded-full border border-dashed border-cyan-400/25" />
+                {!shouldReduceMotion && (
+                  <motion.div
+                    animate={{ scale: [0.6, 1.05], opacity: [0.5, 0] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: 'easeOut' }}
+                    className="absolute h-64 w-64 sm:h-96 sm:w-96 rounded-full border border-cyan-400/40"
+                  />
+                )}
               </div>
 
-              {/* Cyan Rim Lighting Halo & Atmospheric Glow */}
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,200,255,0.28)_0,rgba(0,200,255,0.08)_45%,transparent_75%)] blur-2xl -z-10" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(34,211,238,0.22)_0,transparent_70%)] blur-2xl -z-10" />
 
-              {/* THE LARGE REALISTIC DRONE IMAGE (Dominant 50-60% Visual Area) */}
-              <div className="relative w-full flex items-center justify-center animate-float">
+              {/* Gentle float on touch devices (and subtle hover zoom on desktop) */}
+              <motion.div
+                animate={
+                  shouldReduceMotion
+                    ? undefined
+                    : isTouch
+                      ? { y: [0, -10, 0] }
+                      : undefined
+                }
+                transition={
+                  isTouch
+                    ? { duration: 4.5, repeat: Infinity, ease: 'easeInOut' }
+                    : undefined
+                }
+                className="relative w-full flex items-center justify-center"
+              >
                 <img
                   src="/images/drones/hero-flagship.png"
                   alt="ZIPI Aegis Sentinel MK-IV Flagship Drone"
-                  className="w-full max-w-[680px] sm:max-w-[780px] lg:max-w-[880px] xl:max-w-[980px] 2xl:max-w-[1080px] object-contain select-none filter drop-shadow-[0_30px_70px_rgba(0,200,255,0.45)] drop-shadow-[0_0_35px_rgba(0,200,255,0.3)] transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                  className="w-full max-w-[540px] lg:max-w-[660px] object-contain filter drop-shadow-[0_24px_60px_rgba(34,211,238,0.38)] transition-transform duration-300 group-hover:scale-[1.03]"
                 />
+              </motion.div>
 
-                {/* Subtle Interactive Telemetry Badges */}
-                <div className="absolute -top-2 right-4 hidden sm:flex items-center gap-2 rounded-full border border-[#00C8FF]/40 bg-[#07111F]/90 px-3 py-1 font-mono text-[10px] text-[#00C8FF] backdrop-blur shadow-[0_0_15px_rgba(0,200,255,0.3)]">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#00C8FF] animate-ping" />
-                  <span>TARGET LOCK // ACTIVE</span>
-                </div>
-
-                <div className="absolute bottom-4 left-4 hidden sm:flex items-center gap-2 rounded-full border border-white/20 bg-[#07111F]/90 px-3 py-1 font-mono text-[10px] text-[#AAB7C7] backdrop-blur">
-                  <Activity className="h-3 w-3 text-[#00C8FF]" />
-                  <span>3-AXIS GIMBAL // ±0.005°</span>
-                </div>
-              </div>
-
-              {/* Ground Shadow & Specular Reflection */}
-              <div className="pointer-events-none -mt-6 sm:-mt-8 h-8 w-3/4 max-w-[500px] rounded-full bg-[#00C8FF]/20 blur-xl" />
-              <div className="pointer-events-none -mt-4 h-4 w-1/2 max-w-[360px] rounded-full bg-black/80 blur-md" />
-
-              {/* Prompt Indicator */}
-              <div className="mt-4 flex items-center gap-2 rounded-full border border-[#00C8FF]/30 bg-[#101B2A]/80 px-4 py-1 text-[10px] font-mono tracking-widest text-[#00C8FF] opacity-80 group-hover:opacity-100 group-hover:border-[#00C8FF] transition-all">
-                <Crosshair className="h-3 w-3 text-[#00C8FF] animate-spin-slow" />
-                <span>CLICK FOR 3D CINEMATIC SHOWCASE</span>
-              </div>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenShowcase?.('aegis-mk4');
+                }}
+                className="mt-4 inline-flex items-center gap-2 rounded-full border border-cyan-400/35 bg-[#0b1a2c]/90 px-4 py-1.5 font-mono text-[10px] uppercase tracking-widest text-cyan-300 hover:border-cyan-400 transition"
+              >
+                <Crosshair className="h-3 w-3" />
+                <span>Inspect 3D Showcase</span>
+              </button>
             </motion.div>
           </div>
         </div>
-      </motion.div>
 
-      {/* ==============================================================
-          CINEMATIC DEMO MODAL (Watch Demo Trigger)
-          ============================================================== */}
+        {/* Scroll Cue at Bottom */}
+        <div className="mt-8 flex justify-center">
+          <a
+            href="#categories"
+            className="inline-flex flex-col items-center gap-1 font-mono text-[10px] uppercase tracking-[0.22em] text-[#94a3b8] hover:text-cyan-300 transition py-2 px-4 outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 rounded-xl"
+          >
+            <span>Scroll to explore</span>
+            <ChevronDown
+              className={`h-4 w-4 text-cyan-300 ${shouldReduceMotion ? '' : 'animate-bob'}`}
+            />
+          </a>
+        </div>
+      </div>
+
+      {/* Flight Demo Modal */}
       <AnimatePresence>
         {demoModalOpen && (
           <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
@@ -396,76 +345,76 @@ export default function Hero({ onOpenShowcase }) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setDemoModalOpen(false)}
-              className="absolute inset-0 bg-[#07111F]/90 backdrop-blur-md"
+              className="absolute inset-0 bg-[#050b14]/90 backdrop-blur-md"
             />
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              role="dialog"
+              aria-modal="true"
+              aria-label="ZIPI Flight Demonstration Reel"
+              initial={shouldReduceMotion ? false : { opacity: 0, scale: 0.96, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-4xl overflow-hidden rounded-3xl border border-[#00C8FF]/40 bg-[#101B2A] text-[#F5F8FC] shadow-2xl z-10"
+              exit={{ opacity: 0, scale: 0.96, y: 16 }}
+              transition={{ duration: 0.25 }}
+              className="relative z-10 w-full max-w-4xl overflow-hidden rounded-3xl border border-cyan-400/40 bg-[#0b1a2c] text-[#f1f5f9] shadow-2xl"
             >
-              {/* Header */}
-              <div className="flex items-center justify-between border-b border-white/10 p-5 sm:p-6 bg-[#07111F]">
+              <div className="flex items-center justify-between border-b border-white/10 p-5 bg-[#050b14]">
                 <div className="flex items-center gap-2.5">
-                  <span className="h-2 w-2 rounded-full bg-[#00C8FF] animate-ping" />
-                  <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#00C8FF]">
-                    ZIPI AEROSPACE // FLIGHT DEMONSTRATION REEL
+                  <span className="h-2 w-2 rounded-full bg-cyan-400" />
+                  <span className="font-mono text-xs font-bold uppercase tracking-widest text-cyan-300">
+                    ZIPI DRONES &amp; CONTROLS // FLIGHT DEMONSTRATION REEL
                   </span>
                 </div>
                 <button
+                  type="button"
                   onClick={() => setDemoModalOpen(false)}
-                  className="rounded-full bg-white/10 p-2 text-[#AAB7C7] hover:bg-white/20 hover:text-white transition"
+                  aria-label="Close demonstration"
+                  className="rounded-full bg-white/10 p-2 text-[#94a3b8] hover:bg-white/20 hover:text-white transition"
                 >
                   <X className="h-5 w-5" />
                 </button>
               </div>
 
-              {/* Video Player Reel */}
               <div className="relative aspect-video w-full overflow-hidden bg-black flex items-center justify-center">
                 <img
                   src="https://images.pexels.com/photos/17854251/pexels-photo-17854251.jpeg?auto=compress&cs=tinysrgb&w=1920"
                   alt="UAV Flight Demonstration"
-                  className="h-full w-full object-cover filter brightness-85"
+                  className="h-full w-full object-cover brightness-85"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#07111F] via-transparent to-black/40" />
-
-                {/* Tactical HUD Overlay Over Demo */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#050b14] via-transparent to-black/40" />
                 <div className="absolute inset-0 p-6 flex flex-col justify-between pointer-events-none">
-                  <div className="flex justify-between font-mono text-xs text-[#00C8FF]">
+                  <div className="flex justify-between font-mono text-xs text-cyan-300">
                     <span>RADAR: 360° CONTINUOUS SWEEP</span>
                     <span>4K EO/IR STABILIZED GIMBAL</span>
                   </div>
-                  <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-[#00C8FF]/60 bg-[#07111F]/60 backdrop-blur">
-                    <Play className="h-8 w-8 text-[#00C8FF] fill-current ml-1" />
+                  <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full border border-cyan-400/60 bg-[#050b14]/70 backdrop-blur">
+                    <Sparkles className="h-7 w-7 text-cyan-300" />
                   </div>
-                  <div className="flex justify-between font-mono text-[11px] text-[#AAB7C7]">
-                    <span>AEGIS MK-IV // FLIGHT ENVELOPE: 65 MIN</span>
+                  <div className="flex justify-between font-mono text-[11px] text-[#94a3b8]">
+                    <span>AEGIS MK-IV // NON-WEAPONIZED ISR</span>
                     <span>ENCRYPTION: AES-256 LOCKED</span>
                   </div>
                 </div>
               </div>
 
-              {/* Footer Actions */}
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 sm:p-6 bg-[#07111F] border-t border-white/10">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-[#050b14] border-t border-white/10">
                 <div>
-                  <h4 className="font-display font-bold text-lg text-[#F5F8FC]">
+                  <h3 className="font-display font-bold text-lg text-[#f1f5f9]">
                     Autonomous Flight Envelope Demonstration
-                  </h4>
-                  <p className="text-xs text-[#AAB7C7] mt-0.5">
-                    Field-proven in adverse atmospheric conditions, mountain gales, and GPS-denied environments.
+                  </h3>
+                  <p className="text-xs text-[#94a3b8] mt-0.5">
+                    Field-ready telemetry across coastal winds and GPS-denied observation corridors.
                   </p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <button
-                    onClick={() => {
-                      setDemoModalOpen(false);
-                      if (onOpenShowcase) onOpenShowcase('aegis-mk4');
-                    }}
-                    className="rounded-full bg-[#00C8FF] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#07111F] hover:bg-cyan-300 transition"
-                  >
-                    Open 3D Showcase
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDemoModalOpen(false);
+                    onOpenShowcase?.('aegis-mk4');
+                  }}
+                  className="btn-mission-primary min-h-[44px]"
+                >
+                  Open 3D Showcase
+                </button>
               </div>
             </motion.div>
           </div>

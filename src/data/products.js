@@ -102,7 +102,7 @@ export const PRODUCTS = [
                 id: 'quality',
                 title: 'Premium Quality',
                 shortDesc: 'Toray T800 Carbon-Kevlar Monocoque IP65',
-                detail: 'Ruggedized aerospace monocoque chassis withstands extreme ambient temperatures (-20°C to +55°C) and pressurized water spray with IP65 weatherproofing.',
+                detail: 'Ruggedized carbon-kevlar monocoque chassis withstands extreme ambient temperatures (-20°C to +55°C) and pressurized water spray with IP65 weatherproofing.',
                 metric: 'IP65',
                 metricLabel: 'Weather Protection',
             },
@@ -465,7 +465,7 @@ export const PRODUCTS = [
             quality: {
                 id: 'quality',
                 title: 'Premium Quality',
-                shortDesc: 'Aerospace-Grade Featherweight Monocoque',
+                shortDesc: 'Industrial-Grade Featherweight Monocoque',
                 detail: 'Ultralight Toray carbon-fiber arms maximize flight endurance, enabling continuous large-acreage farm coverage without frequent battery stops.',
                 metric: '44 min',
                 metricLabel: 'Endurance',
@@ -748,7 +748,7 @@ export const PRODUCTS = [
                 id: 'quality',
                 title: 'Premium Quality',
                 shortDesc: 'Precision Magnesium-Carbon Fold Joints',
-                detail: 'Rated for over 15,000 fold cycles with tight aerospace tolerances and zero arm wobble.',
+                detail: 'Rated for over 15,000 fold cycles with tight precision tolerances and zero arm wobble.',
                 metric: '640 g',
                 metricLabel: 'Travel Weight',
             },
@@ -1500,7 +1500,7 @@ export const PRODUCTS = [
             quality: {
                 id: 'quality',
                 title: 'Premium Quality',
-                shortDesc: '19-Inch Rack-Mountable Aerospace Enclosure',
+                shortDesc: '19-Inch Rack-Mountable Industrial Enclosure',
                 detail: 'Heavy-duty steel-aluminum hybrid chassis designed for permanent tactical trailer or naval vessel command bridges.',
                 metric: 'MIL-SPEC',
                 metricLabel: 'Bridge Standards',
@@ -1686,7 +1686,7 @@ export const PRODUCTS = [
             { name: 'Anodized Black Heat-Sink', hex: '#111317' },
             { name: 'Aviation Silver', hex: '#4a505b' },
         ],
-        badge: 'Aerospace-Grade',
+        badge: 'Industrial-Grade',
         specs: {
             dataRate: 'Up to 30 Mbps Net Payload Throughput',
             frequency: '1.4 GHz (1427-1447 MHz) / 2.4 GHz (2400-2483 MHz) Switchable',
@@ -1724,7 +1724,7 @@ export const PRODUCTS = [
             quality: {
                 id: 'quality',
                 title: 'Premium Quality',
-                shortDesc: 'Conductive Cooling Aerospace Grade Alloy',
+                shortDesc: 'Conductive Cooling Industrial Grade Alloy',
                 detail: 'Dissipates heat directly into UAV fuselage with thermal-pad interface for long endurance in thin high-altitude air.',
                 metric: '185 g',
                 metricLabel: 'Payload Weight',
@@ -1834,7 +1834,7 @@ export const PRODUCTS = [
             { name: 'Ceramic White & Titanium', hex: '#d4d8df' },
             { name: 'Stealth Black', hex: '#111317' },
         ],
-        badge: 'Aerospace-Grade',
+        badge: 'Industrial-Grade',
         specs: {
             dataRate: '128 kbps Bidirectional Satellite Command Stream',
             frequency: 'L-Band 1616 - 1626.5 MHz Satellite Uplink',
@@ -1908,7 +1908,7 @@ export const PRODUCTS = [
             { name: 'Anodized Crimson & Black', hex: '#881337' },
             { name: 'Tactical Matte Black', hex: '#111317' },
         ],
-        badge: 'Aerospace-Grade',
+        badge: 'Industrial-Grade',
         specs: {
             processor: 'Dual ARM Cortex-M7 @ 480 MHz + Cortex-M4 Co-Processor',
             gnssConstellations: 'Dual Multi-Constellation RTK (GPS, GLONASS, Galileo, BeiDou)',

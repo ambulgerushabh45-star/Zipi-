@@ -122,8 +122,7 @@ export default function CinematicShowcase({ productId = 'aegis-mk4', initialProd
           <div className="hidden sm:flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-cyan-400 animate-ping"/>
             <span className="text-[11px] font-mono tracking-widest text-cyan-400 uppercase">
-              {product.category.toUpperCase()} // {product.subCategory || 'AEROSPACE SYSTEM'}
-     // {product.subCategory || 'AEROSPACE SYSTEM'}
+              {product.category.toUpperCase()} // {product.subCategory || 'DRONE SYSTEM'}
             </span>
           </div>
         </div>

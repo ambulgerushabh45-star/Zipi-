@@ -2,41 +2,92 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --mission-bg: #050b14;
+  --mission-bg-alt: #08121f;
+  --mission-surface: #0b1a2c;
+  --mission-surface-raised: #112640;
+  --mission-line: rgba(255, 255, 255, 0.1);
+  --mission-text: #f1f5f9;
+  --mission-muted: #94a3b8;
+  --mission-primary-start: #22d3ee;
+  --mission-primary-end: #0ea5e9;
+  --mission-on-primary: #031018;
+  --mission-defence: #60a5fa;
+  --mission-agriculture: #4ade80;
+  --mission-highlight: #fbbf24;
+  --mission-success: #34d399;
+  --mission-danger: #f87171;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
+    background-color: var(--mission-bg);
+    color: var(--mission-text);
   }
   body {
-    @apply bg-ink-50 text-ink-900 font-sans leading-[1.5] antialiased;
+    background-color: var(--mission-bg);
+    color: var(--mission-text);
+    @apply font-sans leading-[1.55] antialiased;
   }
   h1,
   h2,
   h3,
   h4 {
-    @apply font-display leading-[1.2] tracking-tight;
+    @apply font-display leading-[1.15] tracking-tight;
   }
   ::selection {
-    @apply bg-brand-600 text-white;
+    background-color: #22d3ee;
+    color: #031018;
   }
 }
 
 @layer components {
-  .glass {
-    @apply bg-white/70 backdrop-blur-xl border border-white/60 shadow-glass;
+  .glass-card {
+    background-color: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    @apply backdrop-blur-xl;
   }
-  .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-full bg-brand-600 px-6 py-3 text-sm font-semibold uppercase tracking-wider text-white shadow-[0_8px_24px_-8px_rgba(10,92,255,0.6)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-brand-700 hover:shadow-[0_14px_30px_-10px_rgba(10,92,255,0.7)] active:translate-y-0 disabled:cursor-not-allowed disabled:opacity-50;
+  .mission-surface {
+    background-color: var(--mission-surface);
+    border: 1px solid var(--mission-line);
   }
-  .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-full border border-ink-900/15 bg-white/60 px-6 py-3 text-sm font-semibold uppercase tracking-wider text-ink-900 backdrop-blur transition-all duration-300 hover:-translate-y-0.5 hover:border-ink-900 hover:bg-white active:translate-y-0;
+  .btn-mission-primary {
+    background-image: linear-gradient(135deg, #22d3ee 0%, #0ea5e9 100%);
+    color: #031018;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-[0_0_24px_rgba(34,211,238,0.35)] transition duration-200 hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 outline-none focus-visible:ring-2 focus-visible:ring-cyan-300;
   }
-  .eyebrow {
-    @apply text-xs font-semibold uppercase tracking-[0.25em] text-brand-600;
+  .btn-mission-ghost {
+    background-color: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: #f1f5f9;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wider backdrop-blur transition duration-200 hover:border-cyan-400/50 hover:bg-white/[0.08] hover:text-cyan-300 outline-none focus-visible:ring-2 focus-visible:ring-cyan-400;
+  }
+  .hero-grid-overlay {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+  .animate-float,
+  .animate-bob,
+  .animate-pulse,
+  .animate-ping,
+  .animate-spin {
+    animation: none !important;
   }
 }

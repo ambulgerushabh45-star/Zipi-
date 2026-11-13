@@ -1,145 +1,125 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { forwardRef } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const EASE = [0.22, 1, 0.36, 1];
+const MegaMenuPanel = forwardRef(function MegaMenuPanel(
+  { id, menu, onNavigate, onEscape, topClass = 'top-20' },
+  ref
+) {
+  const shouldReduceMotion = useReducedMotion();
 
-const contentVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { duration: 0.25, staggerChildren: 0.05, delayChildren: 0.03 },
-  },
-  exit: { opacity: 0, transition: { duration: 0.15 } },
-};
+  const handlePanelKeyDown = (e) => {
+    const panelEl = e.currentTarget;
+    const links = Array.from(panelEl.querySelectorAll('[data-megamenu-link="true"]'));
+    if (links.length === 0) return;
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 10 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.35, ease: EASE } },
-  exit: { opacity: 0, y: 4, transition: { duration: 0.15 } },
-};
+    const currentIndex = links.indexOf(document.activeElement);
 
-const arrowVariants = {
-  show: { x: 0 },
-  hover: { x: 6, transition: { type: 'spring', stiffness: 400, damping: 22 } },
-};
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % links.length;
+      links[nextIndex].focus();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      const prevIndex =
+        currentIndex <= 0 ? links.length - 1 : currentIndex - 1;
+      links[prevIndex].focus();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      onEscape?.();
+    }
+  };
 
-const imageVariants = {
-  show: { scale: 1 },
-  hover: { scale: 1.05, transition: { duration: 0.8, ease: EASE } },
-};
-
-export default function MegaMenuPanel({ id, menu, onNavigate, onMouseEnter, onMouseLeave }) {
   return (
     <motion.div
+      ref={ref}
       id="mega-menu"
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      initial={{ opacity: 0, y: -12 }}
+      role="region"
+      aria-label={`${menu.title} menu`}
+      onKeyDown={handlePanelKeyDown}
+      initial={shouldReduceMotion ? false : { opacity: 0, y: -6 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -8 }}
-      transition={{ duration: 0.3, ease: EASE }}
-      className="absolute inset-x-0 top-full border-b border-[#101B2A] bg-[#07111F]/98 shadow-[0_30px_70px_rgba(0,0,0,0.85)] backdrop-blur-2xl text-[#F5F8FC]"
+      exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -4 }}
+      transition={{ duration: shouldReduceMotion ? 0 : 0.14, ease: 'easeOut' }}
+      className={`fixed inset-x-0 ${topClass} z-[60] mx-auto w-full max-w-7xl max-h-[calc(100vh-5.5rem)] overflow-y-auto rounded-b-3xl border border-t-0 border-white/10 bg-[#0b1a2c] text-[#f1f5f9] shadow-[0_28px_72px_rgba(0,0,0,0.92)]`}
     >
-      <div className="mx-auto max-w-7xl px-5 pb-12 pt-8 sm:px-8">
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div
-            key={id}
-            variants={contentVariants}
-            initial="hidden"
-            animate="show"
-            exit="exit"
-            className="grid gap-8 md:grid-cols-12 md:gap-12"
-          >
-            <div className="md:col-span-5">
-              <motion.div variants={itemVariants} className="flex items-center gap-2">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#00C8FF] animate-pulse" />
-                <p className="text-[11px] font-mono font-bold uppercase tracking-[0.25em] text-[#00C8FF]">
-                  {menu.eyebrow}
-                </p>
-              </motion.div>
-
-              <ul className="mt-6 space-y-1">
-                {menu.links.map((link) => (
-                  <motion.li
-                    key={link.label}
-                    variants={itemVariants}
-                    whileHover="hover"
-                    className="border-b border-white/5 last:border-b-0"
-                  >
-                    <Link
-                      to={link.to}
-                      onClick={onNavigate}
-                      className="group flex items-center justify-between rounded-xl py-3.5 px-3 transition-colors duration-200 hover:bg-[#101B2A] outline-none focus-visible:ring-2 focus-visible:ring-[#00C8FF]"
-                    >
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-display text-lg font-bold text-[#F5F8FC] transition-colors duration-200 group-hover:text-[#00C8FF]">
-                            {link.label}
-                          </span>
-                          {link.badge && (
-                            <span className="rounded-full border border-[#00C8FF]/40 bg-[#00C8FF]/10 px-2 py-0.5 text-[9px] font-mono font-bold text-[#00C8FF]">
-                              {link.badge}
-                            </span>
-                          )}
-                        </div>
-                        {link.tagline && (
-                          <p className="mt-0.5 text-xs text-[#AAB7C7] font-light">
-                            {link.tagline}
-                          </p>
-                        )}
-                      </div>
-
-                      <motion.span
-                        variants={arrowVariants}
-                        className="flex text-[#AAB7C7] transition-colors duration-200 group-hover:text-[#00C8FF]"
-                      >
-                        <ArrowRight className="h-5 w-5" />
-                      </motion.span>
-                    </Link>
-                  </motion.li>
-                ))}
-              </ul>
+      <div className="px-5 py-7 sm:px-8">
+        <div key={id} className="grid gap-8 md:grid-cols-12 md:gap-10 items-start">
+          {/* Single-column list on the left */}
+          <div className="md:col-span-6">
+            <div className="flex items-center gap-2 border-b border-white/10 pb-3">
+              <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-cyan-300">
+                {menu.eyebrow}
+              </p>
             </div>
 
-            <motion.div
-              variants={itemVariants}
-              whileHover="hover"
-              className="group relative h-[360px] overflow-hidden rounded-3xl border border-[#101B2A] bg-[#101B2A]/70 md:col-span-7 shadow-lg"
+            <ul className="mt-3 divide-y divide-white/10">
+              {menu.links.map((link) => (
+                <li key={link.label}>
+                  <Link
+                    to={link.to}
+                    data-megamenu-link="true"
+                    onClick={onNavigate}
+                    className="group block rounded-xl px-3 py-3 transition-colors duration-150 hover:bg-[#101B2A] outline-none focus-visible:ring-2 focus-visible:ring-[#00C8FF]"
+                  >
+                    <div className="flex items-center gap-2.5">
+                      <span className="font-display text-base font-bold text-[#F8FAFC] transition-colors duration-150 group-hover:text-[#00C8FF]">
+                        {link.label}
+                      </span>
+                      {link.badge && (
+                        <span className="rounded-full border border-cyan-400/40 bg-cyan-400/10 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider text-cyan-300">
+                          {link.badge}
+                        </span>
+                      )}
+                    </div>
+                    {link.tagline && (
+                      <p className="mt-0.5 text-xs text-slate-300 leading-relaxed">
+                        {link.tagline}
+                      </p>
+                    )}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Featured image card on the right */}
+          <div className="group relative h-[320px] overflow-hidden rounded-3xl border border-white/10 bg-[#101B2A] md:col-span-6 shadow-xl">
+            <div className="absolute inset-0 overflow-hidden">
+              <img
+                src={menu.promo.image}
+                alt={menu.promo.imageAlt}
+                className="h-full w-full object-cover brightness-75 contrast-110 transition-transform duration-300 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#07111d] via-[#07111d]/70 to-transparent" />
+            </div>
+
+            <Link
+              to={menu.promo.to}
+              data-megamenu-link="true"
+              onClick={onNavigate}
+              className="relative z-10 flex h-full flex-col justify-end p-7 outline-none focus-visible:ring-2 focus-visible:ring-[#00C8FF] sm:p-9"
             >
-              <div className="absolute inset-0 overflow-hidden">
-                <motion.img
-                  src={menu.promo.image}
-                  alt={menu.promo.imageAlt}
-                  variants={imageVariants}
-                  className="h-full w-full object-cover filter brightness-75 contrast-110"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#07111F] via-[#07111F]/60 to-transparent" />
+              <div className="inline-flex w-fit items-center gap-2 rounded-full border border-white/20 bg-[#07111d]/90 px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-cyan-300">
+                <Sparkles className="h-3 w-3 text-cyan-300" />
+                <span>{menu.promo.eyebrow}</span>
               </div>
 
-              <Link
-                to={menu.promo.to}
-                onClick={onNavigate}
-                className="relative z-10 flex h-full flex-col justify-end p-8 outline-none focus-visible:ring-2 focus-visible:ring-[#00C8FF] sm:p-10"
-              >
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-[#07111F]/80 px-3 py-1 text-[10px] font-mono uppercase tracking-widest text-[#00C8FF] backdrop-blur w-fit">
-                  <Sparkles className="h-3 w-3 text-[#00C8FF]" />
-                  <span>{menu.promo.eyebrow}</span>
-                </div>
+              <h3 className="mt-3 max-w-lg font-display text-2xl font-extrabold leading-tight text-[#F8FAFC]">
+                {menu.promo.headline}
+              </h3>
 
-                <h3 className="mt-4 max-w-lg font-display text-2xl font-extrabold leading-tight text-[#F5F8FC] sm:text-3xl">
-                  {menu.promo.headline}
-                </h3>
-
-                <div className="mt-4 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#00C8FF] group-hover:text-[#FF9B42] transition-colors">
-                  <span>{menu.promo.cta || 'Explore System'}</span>
-                  <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </div>
-              </Link>
-            </motion.div>
-          </motion.div>
-        </AnimatePresence>
+              <span className="mt-4 inline-block font-mono text-xs font-bold uppercase tracking-wider text-cyan-300 transition-colors group-hover:text-sky-300">
+                {menu.promo.cta || 'Explore System'}
+              </span>
+            </Link>
+          </div>
+        </div>
       </div>
     </motion.div>
   );
-}
+});
+
+export default MegaMenuPanel;

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, Send, X, CheckCircle2, Building2, User, Mail, Phone } from 'lucide-react';
 export default function QuoteModal({ product, open, onClose }) {
@@ -143,13 +144,21 @@ export default function QuoteModal({ product, open, onClose }) {
                     <textarea rows={3} value={formData.notes} onChange={(e) => setFormData({ ...formData, notes: e.target.value })} placeholder="Specify mission operational ceiling, encryption protocols, ground control preferences, or payload integrations..." className="w-full rounded-xl border border-white/15 bg-white/5 p-3 text-sm text-white placeholder-zinc-500 focus:border-cyan-400 focus:outline-none focus:ring-1 focus:ring-cyan-400"/>
                   </div>
 
-                  <div className="pt-2">
+                  <div className="pt-2 space-y-2.5">
                     <button type="submit" className="w-full flex items-center justify-center gap-2 rounded-xl bg-cyan-400 py-3.5 text-xs font-bold uppercase tracking-[0.2em] text-black hover:bg-cyan-300 transition-all duration-300 hover:shadow-[0_0_30px_rgba(0,229,255,0.6)]">
                       <Send className="h-4 w-4"/>
                       <span>Transmit Quotation Request</span>
                     </button>
-                    <p className="mt-2 text-center text-[10px] font-mono text-zinc-500">
-                      AES-256 Encrypted Protocol // ZIPI Aerospace Commercial &amp; Defence Sales
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] font-mono text-zinc-400">
+                      <Link to={`/contact?type=order&product=${product.id}`} onClick={onClose} className="text-cyan-300 hover:underline">
+                        Open full Order Enquiry →
+                      </Link>
+                      <Link to={`/contact?type=dealer&product=${product.id}`} onClick={onClose} className="text-sky-300 hover:underline">
+                        Dealer / Partner Enquiry →
+                      </Link>
+                    </div>
+                    <p className="text-center text-[10px] font-mono text-zinc-500">
+                      AES-256 Encrypted Protocol // ZIPI Drones &amp; Controls Commercial &amp; Defence Sales
                     </p>
                   </div>
                 </form>
@@ -169,7 +178,7 @@ export default function QuoteModal({ product, open, onClose }) {
                 </h3>
 
                 <p className="mx-auto mt-3 max-w-md text-sm text-zinc-300 leading-relaxed font-light">
-                  Thank you, <strong className="text-white">{formData.name}</strong>. Our aerospace procurement specialists have received your request for the{' '}
+                  Thank you, <strong className="text-white">{formData.name}</strong>. Our ZIPI Drones &amp; Controls procurement specialists have received your request for the{' '}
                   <strong className="text-cyan-300">{product.name}</strong> ({formData.quantity}).
                 </p>
 

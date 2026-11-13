@@ -1,220 +1,221 @@
-import { motion } from 'framer-motion';
-import { ArrowRight, Shield, Sprout, Crosshair, Radar, Droplets, Activity, Layers, HeartPulse } from 'lucide-react';
+import { useState } from 'react';
+import { Shield, Sprout, Crosshair, Radar, Layers, HeartPulse, Droplets, Activity } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Reveal } from '@/components/motion';
 
 const DEFENCE_BG =
   'https://images.pexels.com/photos/17854251/pexels-photo-17854251.jpeg?auto=compress&cs=tinysrgb&w=1200';
 const AGRI_BG =
   'https://images.pexels.com/photos/34182367/pexels-photo-34182367.jpeg?auto=compress&cs=tinysrgb&w=1200';
 
+const DEFENCE_MISSIONS = [
+  { icon: Crosshair, title: 'Surveillance & Persistent Monitoring', desc: '40x optical EO/IR zoom and FLIR thermal detection up to 25 km.' },
+  { icon: Radar, title: 'Reconnaissance & Corridor Verification', desc: 'Quiet acoustic signature with terrain-aware micro-radar.' },
+  { icon: Layers, title: 'Border & Perimeter Security', desc: 'Autonomous dock patrols and real-time perimeter alerts.' },
+  { icon: HeartPulse, title: 'Search and Rescue Support', desc: '12,000-lumen tracking lights and lifeline cargo drops.' },
+];
+
+const AGRI_MISSIONS = [
+  { icon: Droplets, title: 'Precision Variable-Rate Spraying', desc: '40-liter centrifugal atomizing sprayers up to 45 acres/hour.' },
+  { icon: Activity, title: '5-Band Multispectral Crop Monitoring', desc: 'Detect canopy chlorophyll and water stress early.' },
+  { icon: Layers, title: 'Topographic Field Mapping', desc: '61MP photogrammetry and sub-cm RTK slope elevation models.' },
+  { icon: Sprout, title: 'Input Reduction Workflows', desc: 'Targeted weed prescriptions reducing chemical runoff up to 35%.' },
+];
+
 export default function DefenceAgriSplit({ onOpenShowcase }) {
+  const [expanded, setExpanded] = useState(null);
+
   return (
-    <section id="sectors" className="relative scroll-mt-20 bg-[#07111F] py-20 px-5 sm:px-8 border-t border-[#101B2A]">
+    <section id="sectors" className="relative scroll-mt-20 border-t border-white/10 bg-[#050b14] py-20 px-5 sm:px-8">
       <div className="mx-auto max-w-7xl">
-        {/* Section Header */}
-        <div className="mb-14 text-center">
-          <span className="text-xs font-mono font-bold uppercase tracking-[0.3em] text-[#00C8FF]">
-            STRATEGIC SECTOR PREVIEWS
+        <Reveal direction="up" className="mb-14 text-center">
+          <span className="text-xs font-mono font-bold uppercase tracking-[0.28em] text-cyan-300">
+            STRATEGIC MISSION SECTORS
           </span>
-          <h2 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-[#F5F8FC] sm:text-5xl">
-            Dual Fronts of Airborne Innovation
+          <h2 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-[#f1f5f9] sm:text-5xl">
+            Dual Fronts of Autonomous Flight
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-[#AAB7C7]">
-            Purpose-built unmanned aerial architectures deployed across tactical security frontiers and high-yield autonomous agricultural fields.
+          <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-[#94a3b8]">
+            Hover on desktop or tap a panel on mobile to expand our non-weaponized Defence ISR and Precision Agriculture capabilities.
           </p>
-        </div>
+        </Reveal>
 
-        {/* 2 PROMINENT VISUALLY IMPRESSIVE SECTIONS */}
-        <div className="grid gap-8 lg:grid-cols-2">
-          {/* ========================================================
-              1. DEFENCE SECTION (Dark navy, deep graphite, electric cyan)
-              ======================================================== */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-[#00C8FF]/30 bg-[#101B2A] p-8 sm:p-10 transition-all duration-500 hover:border-[#00C8FF] hover:shadow-[0_0_50px_rgba(0,200,255,0.22)]"
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* 1. DEFENCE PANEL (#60a5fa Defence Blue) */}
+          <Reveal
+            direction="left"
+            className={`transition-all duration-300 ${
+              expanded === 'defence'
+                ? 'lg:flex-[1.35]'
+                : expanded === 'agriculture'
+                  ? 'lg:flex-[0.85]'
+                  : 'lg:flex-1'
+            }`}
           >
-            {/* Background Image with Cinematic Overlay */}
-            <div className="absolute inset-0 -z-10 overflow-hidden">
-              <img
-                src={DEFENCE_BG}
-                alt="Tactical Defence Drone"
-                className="h-full w-full object-cover opacity-25 filter brightness-75 contrast-125 transition-transform duration-1000 ease-out group-hover:scale-108 group-hover:opacity-35"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#101B2A] via-[#101B2A]/85 to-transparent" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(0,200,255,0.15)_0,transparent_60%)]" />
-            </div>
-
-            <div>
-              {/* Sector Pill */}
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#00C8FF]/40 bg-[#07111F]/80 px-3.5 py-1 text-[11px] font-mono uppercase tracking-widest text-[#00C8FF] backdrop-blur">
-                <Shield className="h-3.5 w-3.5 text-[#00C8FF]" />
-                <span>DEFENCE &amp; SECURITY SYSTEMS</span>
+            <div
+              onMouseEnter={() => setExpanded('defence')}
+              onMouseLeave={() => setExpanded(null)}
+              onClick={() => setExpanded((prev) => (prev === 'defence' ? null : 'defence'))}
+              className={`group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border bg-[#0b1a2c] p-7 sm:p-9 transition-all duration-300 cursor-pointer ${
+                expanded === 'defence'
+                  ? 'border-[#60a5fa] shadow-[0_0_45px_rgba(96,165,250,0.2)]'
+                  : 'border-[#60a5fa]/35 hover:border-[#60a5fa]'
+              }`}
+            >
+              <div className="pointer-events-none absolute inset-0 -z-0 overflow-hidden">
+                <img
+                  src={DEFENCE_BG}
+                  alt="Non-weaponized tactical surveillance drone"
+                  loading="lazy"
+                  className="h-full w-full object-cover opacity-20 brightness-75 transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0b1a2c] via-[#0b1a2c]/85 to-transparent" />
               </div>
 
-              {/* Exact Requested Heading */}
-              <h3 className="mt-5 font-display text-3xl font-extrabold text-[#F5F8FC] sm:text-4xl">
-                Mission-Ready Intelligence.
-              </h3>
-
-              {/* Exact Supporting Text */}
-              <p className="mt-4 text-sm sm:text-base leading-relaxed text-[#AAB7C7]">
-                Engineered strictly for lawful, non-weaponized aerial surveillance, reconnaissance, security monitoring, and rapid search and rescue support. Zero compromise in GPS-denied or adverse atmospheric theaters.
-              </p>
-
-              {/* 4 Pillars */}
-              <div className="mt-8 space-y-3">
-                <div className="flex items-start gap-3 rounded-2xl border border-white/5 bg-[#07111F]/60 p-3.5 backdrop-blur transition-colors duration-300 group-hover:border-[#00C8FF]/30">
-                  <Crosshair className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#00C8FF]" />
-                  <div>
-                    <h4 className="text-sm font-bold text-[#F5F8FC]">Surveillance &amp; Persistent Monitoring</h4>
-                    <p className="text-xs text-[#AAB7C7]">40x continuous optical EO/IR zoom and FLIR thermal detection up to 25 km.</p>
-                  </div>
+              <div className="relative z-10">
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#60a5fa]/40 bg-[#050b14]/85 px-3.5 py-1 font-mono text-[11px] uppercase tracking-widest text-[#60a5fa]">
+                  <Shield className="h-3.5 w-3.5" />
+                  <span>DEFENCE &amp; SECURITY // NON-WEAPONIZED ISR</span>
                 </div>
 
-                <div className="flex items-start gap-3 rounded-2xl border border-white/5 bg-[#07111F]/60 p-3.5 backdrop-blur transition-colors duration-300 group-hover:border-[#00C8FF]/30">
-                  <Radar className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#00C8FF]" />
-                  <div>
-                    <h4 className="text-sm font-bold text-[#F5F8FC]">Reconnaissance &amp; Corridor Verification</h4>
-                    <p className="text-xs text-[#AAB7C7]">Silent acoustic footprint with micro-radar terrain navigation.</p>
-                  </div>
-                </div>
+                <h3 className="mt-5 font-display text-3xl font-extrabold text-[#f1f5f9] sm:text-4xl">
+                  Mission-Ready Intelligence.
+                </h3>
 
-                <div className="flex items-start gap-3 rounded-2xl border border-white/5 bg-[#07111F]/60 p-3.5 backdrop-blur transition-colors duration-300 group-hover:border-[#00C8FF]/30">
-                  <Layers className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#00C8FF]" />
-                  <div>
-                    <h4 className="text-sm font-bold text-[#F5F8FC]">Security Monitoring &amp; Perimeter Sentry</h4>
-                    <p className="text-xs text-[#AAB7C7]">Autonomous docking stations with real-time AI perimeter tripwire alerts.</p>
-                  </div>
-                </div>
+                <p className="mt-3 text-sm sm:text-base leading-relaxed text-[#94a3b8]">
+                  Built strictly for lawful, non-weaponized aerial observation, border security, critical asset monitoring, and humanitarian search and rescue.
+                </p>
 
-                <div className="flex items-start gap-3 rounded-2xl border border-white/5 bg-[#07111F]/60 p-3.5 backdrop-blur transition-colors duration-300 group-hover:border-[#00C8FF]/30">
-                  <HeartPulse className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#00C8FF]" />
-                  <div>
-                    <h4 className="text-sm font-bold text-[#F5F8FC]">Search and Rescue Support</h4>
-                    <p className="text-xs text-[#AAB7C7]">12,000-lumen tracking searchlights and remote life-saving cargo drops.</p>
-                  </div>
+                <div className="mt-6 space-y-2.5">
+                  {DEFENCE_MISSIONS.map((m) => {
+                    const Icon = m.icon;
+                    return (
+                      <div
+                        key={m.title}
+                        className="flex items-start gap-3 rounded-2xl border border-white/10 bg-[#050b14]/70 p-3.5"
+                      >
+                        <Icon className="mt-0.5 h-5 w-5 shrink-0 text-[#60a5fa]" />
+                        <div>
+                          <h4 className="text-sm font-bold text-[#f1f5f9]">{m.title}</h4>
+                          <p className="text-xs text-[#94a3b8]">{m.desc}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-            </div>
 
-            {/* Bottom Actions */}
-            <div className="mt-10 flex flex-wrap items-center gap-4 pt-6 border-t border-white/10">
-              <Link
-                to="/defence"
-                className="group/btn inline-flex items-center gap-2 rounded-xl bg-[#00C8FF] px-7 py-3.5 text-xs font-bold uppercase tracking-wider text-[#07111F] shadow-[0_0_24px_rgba(0,200,255,0.6)] transition-all duration-300 hover:bg-cyan-300 hover:scale-105"
-              >
-                <span>Explore Defence</span>
-                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
-              </Link>
-
-              {onOpenShowcase && (
-                <button
-                  onClick={() => onOpenShowcase('aegis-mk4')}
-                  className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-[#F5F8FC] hover:bg-white/15 transition"
+              <div className="relative z-10 mt-8 flex flex-wrap items-center gap-3 pt-5 border-t border-white/10">
+                <Link
+                  to="/defence"
+                  onClick={(e) => e.stopPropagation()}
+                  className="btn-mission-primary min-h-[44px]"
                 >
-                  View Aegis MK-IV
-                </button>
-              )}
+                  <span>Explore Defence</span>
+                </Link>
+                {onOpenShowcase && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenShowcase('aegis-mk4');
+                    }}
+                    className="btn-mission-ghost min-h-[44px]"
+                  >
+                    Inspect Aegis MK-IV
+                  </button>
+                )}
+              </div>
             </div>
-          </motion.div>
+          </Reveal>
 
-          {/* ========================================================
-              2. AGRICULTURE SECTION (Dark-to-natural green visual treatment)
-              ======================================================== */}
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-            className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-[#67B56B]/30 bg-[#101B2A] p-8 sm:p-10 transition-all duration-500 hover:border-[#67B56B] hover:shadow-[0_0_50px_rgba(103,181,107,0.22)]"
+          {/* 2. AGRICULTURE PANEL (#4ade80 Agriculture Green) */}
+          <Reveal
+            direction="right"
+            className={`transition-all duration-300 ${
+              expanded === 'agriculture'
+                ? 'lg:flex-[1.35]'
+                : expanded === 'defence'
+                  ? 'lg:flex-[0.85]'
+                  : 'lg:flex-1'
+            }`}
           >
-            {/* Background Image with Natural Green Overlay */}
-            <div className="absolute inset-0 -z-10 overflow-hidden">
-              <img
-                src={AGRI_BG}
-                alt="Agricultural Spraying Drone"
-                className="h-full w-full object-cover opacity-25 filter brightness-85 contrast-115 transition-transform duration-1000 ease-out group-hover:scale-108 group-hover:opacity-35"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#101B2A] via-[#101B2A]/85 to-transparent" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(103,181,107,0.2)_0,transparent_60%)]" />
-            </div>
-
-            <div>
-              {/* Sector Pill */}
-              <div className="inline-flex items-center gap-2 rounded-full border border-[#67B56B]/40 bg-[#07111F]/80 px-3.5 py-1 text-[11px] font-mono uppercase tracking-widest text-[#67B56B] backdrop-blur">
-                <Sprout className="h-3.5 w-3.5 text-[#67B56B]" />
-                <span>PRECISION AGRICULTURE &amp; FARMING</span>
+            <div
+              onMouseEnter={() => setExpanded('agriculture')}
+              onMouseLeave={() => setExpanded(null)}
+              onClick={() => setExpanded((prev) => (prev === 'agriculture' ? null : 'agriculture'))}
+              className={`group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border bg-[#0b1a2c] p-7 sm:p-9 transition-all duration-300 cursor-pointer ${
+                expanded === 'agriculture'
+                  ? 'border-[#4ade80] shadow-[0_0_45px_rgba(74,222,128,0.2)]'
+                  : 'border-[#4ade80]/35 hover:border-[#4ade80]'
+              }`}
+            >
+              <div className="pointer-events-none absolute inset-0 -z-0 overflow-hidden">
+                <img
+                  src={AGRI_BG}
+                  alt="Precision agriculture spraying drone"
+                  loading="lazy"
+                  className="h-full w-full object-cover opacity-20 brightness-75 transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0b1a2c] via-[#0b1a2c]/85 to-transparent" />
               </div>
 
-              {/* Exact Requested Heading */}
-              <h3 className="mt-5 font-display text-3xl font-extrabold text-[#F5F8FC] sm:text-4xl">
-                Smarter Farming with Drones.
-              </h3>
-
-              {/* Exact Supporting Text */}
-              <p className="mt-4 text-sm sm:text-base leading-relaxed text-[#AAB7C7]">
-                Revolutionizing modern agronomic yields with high-capacity atomizing sprayers, sub-centimeter RTK topographic terrain mapping, and multi-band NDVI crop health analysis.
-              </p>
-
-              {/* 4 Pillars */}
-              <div className="mt-8 space-y-3">
-                <div className="flex items-start gap-3 rounded-2xl border border-white/5 bg-[#07111F]/60 p-3.5 backdrop-blur transition-colors duration-300 group-hover:border-[#67B56B]/30">
-                  <Droplets className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#67B56B]" />
-                  <div>
-                    <h4 className="text-sm font-bold text-[#F5F8FC]">Precision Spraying</h4>
-                    <p className="text-xs text-[#AAB7C7]">40-liter payload with centrifugal atomizing nozzles covering up to 45 acres/hour.</p>
-                  </div>
+              <div className="relative z-10">
+                <div className="inline-flex items-center gap-2 rounded-full border border-[#4ade80]/40 bg-[#050b14]/85 px-3.5 py-1 font-mono text-[11px] uppercase tracking-widest text-[#4ade80]">
+                  <Sprout className="h-3.5 w-3.5" />
+                  <span>PRECISION AGRICULTURE &amp; FARMING</span>
                 </div>
 
-                <div className="flex items-start gap-3 rounded-2xl border border-white/5 bg-[#07111F]/60 p-3.5 backdrop-blur transition-colors duration-300 group-hover:border-[#67B56B]/30">
-                  <Activity className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#67B56B]" />
-                  <div>
-                    <h4 className="text-sm font-bold text-[#F5F8FC]">Crop Monitoring</h4>
-                    <p className="text-xs text-[#AAB7C7]">5-band multispectral radiometric sensors identifying water and nitrogen stress.</p>
-                  </div>
-                </div>
+                <h3 className="mt-5 font-display text-3xl font-extrabold text-[#f1f5f9] sm:text-4xl">
+                  Smarter Farming with Drones.
+                </h3>
 
-                <div className="flex items-start gap-3 rounded-2xl border border-white/5 bg-[#07111F]/60 p-3.5 backdrop-blur transition-colors duration-300 group-hover:border-[#67B56B]/30">
-                  <Layers className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#67B56B]" />
-                  <div>
-                    <h4 className="text-sm font-bold text-[#F5F8FC]">Field Mapping</h4>
-                    <p className="text-xs text-[#AAB7C7]">61MP mechanical shutter photogrammetry and 3D elevation slope modeling.</p>
-                  </div>
-                </div>
+                <p className="mt-3 text-sm sm:text-base leading-relaxed text-[#94a3b8]">
+                  High-capacity atomizing sprayers, sub-centimeter RTK terrain mapping, and 5-band NDVI diagnostics for measurable field efficiency.
+                </p>
 
-                <div className="flex items-start gap-3 rounded-2xl border border-white/5 bg-[#07111F]/60 p-3.5 backdrop-blur transition-colors duration-300 group-hover:border-[#67B56B]/30">
-                  <Sprout className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#67B56B]" />
-                  <div>
-                    <h4 className="text-sm font-bold text-[#F5F8FC]">Variable-Rate Prescription</h4>
-                    <p className="text-xs text-[#AAB7C7]">Cuts chemical runoff up to 35% with tractor terminal ISOBUS integration.</p>
-                  </div>
+                <div className="mt-6 space-y-2.5">
+                  {AGRI_MISSIONS.map((m) => {
+                    const Icon = m.icon;
+                    return (
+                      <div
+                        key={m.title}
+                        className="flex items-start gap-3 rounded-2xl border border-white/10 bg-[#050b14]/70 p-3.5"
+                      >
+                        <Icon className="mt-0.5 h-5 w-5 shrink-0 text-[#4ade80]" />
+                        <div>
+                          <h4 className="text-sm font-bold text-[#f1f5f9]">{m.title}</h4>
+                          <p className="text-xs text-[#94a3b8]">{m.desc}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
-            </div>
 
-            {/* Bottom Actions */}
-            <div className="mt-10 flex flex-wrap items-center gap-4 pt-6 border-t border-white/10">
-              <Link
-                to="/agriculture"
-                className="group/btn inline-flex items-center gap-2 rounded-xl bg-[#67B56B] px-7 py-3.5 text-xs font-bold uppercase tracking-wider text-[#07111F] shadow-[0_0_24px_rgba(103,181,107,0.6)] transition-all duration-300 hover:bg-emerald-400 hover:scale-105"
-              >
-                <span>Explore Agriculture</span>
-                <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
-              </Link>
-
-              {onOpenShowcase && (
-                <button
-                  onClick={() => onOpenShowcase('terra-spray-x40')}
-                  className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/5 px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-[#F5F8FC] hover:bg-white/15 transition"
+              <div className="relative z-10 mt-8 flex flex-wrap items-center gap-3 pt-5 border-t border-white/10">
+                <Link
+                  to="/agriculture"
+                  onClick={(e) => e.stopPropagation()}
+                  className="btn-mission-primary min-h-[44px]"
                 >
-                  View Terra Spray X40
-                </button>
-              )}
+                  <span>Explore Agriculture</span>
+                </Link>
+                {onOpenShowcase && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpenShowcase('terra-spray-x40');
+                    }}
+                    className="btn-mission-ghost min-h-[44px]"
+                  >
+                    Inspect Terra Spray X40
+                  </button>
+                )}
+              </div>
             </div>
-          </motion.div>
+          </Reveal>
         </div>
       </div>
     </section>

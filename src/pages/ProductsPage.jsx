@@ -1,15 +1,18 @@
-import { useState, useMemo, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, SlidersHorizontal, Sparkles, Eye, Heart, Plus, Layers, X, FileText, Check, } from 'lucide-react';
+import { Search, SlidersHorizontal, Sparkles, Eye, Heart, Plus, Layers, X, FileText, Check, ArrowRight, Gamepad2 } from 'lucide-react';
 import { PRODUCTS, CATEGORY_LABELS } from '@/data/products';
 import { formatPrice } from '@/lib/format';
 import { useShop } from '@/hooks/useShop';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { Reveal, Tilt } from '@/components/motion';
 import QuickViewModal from '@/components/product/QuickViewModal';
 import QuoteModal from '@/components/common/QuoteModal';
 import StarRating from '@/components/product/StarRating';
 import Footer from '@/components/layout/Footer';
 import DroneRender from '@/components/showcase/DroneRender';
+
 const FILTER_TABS = [
     { id: 'all', label: 'All Systems' },
     { id: 'uav-drones', label: 'UAV Drones' },
@@ -21,36 +24,81 @@ const FILTER_TABS = [
     { id: 'commercial', label: 'Commercial & Industrial' },
     { id: 'accessories', label: 'Accessories' },
 ];
+
 export default function ProductsPage({ onOpenShowcase, }) {
-    const [searchParams] = useSearchParams();
-    const initialCategory = searchParams.get('category') || 'all';
-    const initialSearch = searchParams.get('q') || '';
+    useDocumentTitle('Hardware Catalog');
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const resolveCategoryFromParams = useCallback((params) => {
+        const typeParam = params.get('type');
+        if (typeParam === 'controller') return 'controllers';
+        return params.get('category') || 'all';
+    }, []);
+
+    const [selectedCategory, setSelectedCategory] = useState(() => resolveCategoryFromParams(searchParams));
+    const [searchQuery, setSearchQuery] = useState(() => searchParams.get('q') || '');
+    const [sortBy, setSortBy] = useState(() => {
+        const f = searchParams.get('filter');
+        if (f === 'new') return 'new';
+        if (f === 'featured') return 'featured';
+        return searchParams.get('sort') || 'featured';
+    });
+
     const { wishlist, toggleWishlist, addToCart, compare, toggleCompare, removeFromCompare } = useShop();
-    const [selectedCategory, setSelectedCategory] = useState(initialCategory);
-    const [searchQuery, setSearchQuery] = useState(initialSearch);
-    const [sortBy, setSortBy] = useState('featured');
     const [quickViewProduct, setQuickViewProduct] = useState(null);
     const [quoteModalProduct, setQuoteModalProduct] = useState(null);
     const [compareModalOpen, setCompareModalOpen] = useState(false);
     const [addedItemNotice, setAddedItemNotice] = useState(null);
 
-    // Sync state when URL params change (e.g. from navbar dropdown clicks)
+    // Sync state when external URL navigation changes query parameters
     useEffect(() => {
-        const cat = searchParams.get('category');
-        if (cat) {
-            setSelectedCategory(cat);
-        }
+        const nextCat = resolveCategoryFromParams(searchParams);
+        setSelectedCategory(nextCat);
         const q = searchParams.get('q');
-        if (q !== null) {
-            setSearchQuery(q);
-        }
+        setSearchQuery(q !== null ? q : '');
         const filter = searchParams.get('filter');
-        if (filter === 'new') {
-            setSortBy('new');
-        } else if (filter === 'featured') {
-            setSortBy('featured');
+        const sort = searchParams.get('sort');
+        if (filter === 'new') setSortBy('new');
+        else if (filter === 'featured') setSortBy('featured');
+        else if (sort) setSortBy(sort);
+    }, [searchParams, resolveCategoryFromParams]);
+
+    const syncUrlParams = useCallback((cat, q, sort) => {
+        const next = new URLSearchParams();
+        if (cat && cat !== 'all') {
+            next.set('category', cat);
         }
-    }, [searchParams]);
+        if (q && q.trim()) {
+            next.set('q', q);
+        }
+        if (sort && sort !== 'featured') {
+            if (sort === 'new') next.set('filter', 'new');
+            else next.set('sort', sort);
+        }
+        setSearchParams(next, { replace: true });
+    }, [setSearchParams]);
+
+    const handleCategorySelect = (cat) => {
+        setSelectedCategory(cat);
+        syncUrlParams(cat, searchQuery, sortBy);
+    };
+
+    const handleSearchChange = (q) => {
+        setSearchQuery(q);
+        syncUrlParams(selectedCategory, q, sortBy);
+    };
+
+    const handleSortChange = (s) => {
+        setSortBy(s);
+        syncUrlParams(selectedCategory, searchQuery, s);
+    };
+
+    const handleResetFilters = () => {
+        setSearchQuery('');
+        setSelectedCategory('all');
+        setSortBy('featured');
+        setSearchParams({}, { replace: true });
+    };
     // Filtered and Sorted Products across all 4 hardware categories
     const filteredProducts = useMemo(() => {
         return PRODUCTS.filter((p) => {
@@ -122,86 +170,132 @@ export default function ProductsPage({ onOpenShowcase, }) {
         setAddedItemNotice(p.id);
         setTimeout(() => setAddedItemNotice(null), 1800);
     };
-    return (<div className="min-h-screen bg-neutral-950 text-white pt-24">
+    return (<div className="min-h-screen bg-[#050b14] text-[#f1f5f9] pt-24">
       {/* Header Bar */}
-      <section className="mx-auto max-w-7xl px-5 py-12 sm:px-8 border-b border-white/10">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-          <div>
-            <span className="text-xs font-mono uppercase tracking-[0.25em] text-cyan-400">
-              FLEET HARDWARE CATALOG
-            </span>
-            <h1 className="mt-2 font-display text-4xl sm:text-5xl font-extrabold text-white">
-              Autonomous Systems &amp; Equipment
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm text-zinc-400 leading-relaxed font-light">
-              Explore tactical defence and agricultural UAV drones, long-range remote controllers, rugged Ground Control Stations (GCS), and encrypted avionics datalinks.
-            </p>
-          </div>
+      <section className="relative overflow-hidden border-b border-white/10 bg-[#08121f]/60">
+        <div className="pointer-events-none absolute inset-0 hero-grid-overlay opacity-40" />
+        <div className="relative mx-auto max-w-7xl px-5 py-12 sm:px-8">
+          <Reveal className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+              <span className="text-xs font-mono uppercase tracking-[0.25em] text-cyan-400">
+                FLEET HARDWARE CATALOG
+              </span>
+              <h1 className="mt-2 font-display text-4xl sm:text-5xl font-extrabold text-[#f1f5f9]">
+                Autonomous Systems &amp; Equipment
+              </h1>
+              <p className="mt-2 max-w-2xl text-sm text-[#94a3b8] leading-relaxed">
+                Explore non-weaponized ISR and precision agricultural UAV drones, long-range remote controllers, rugged Ground Control Stations, and encrypted avionics datalinks.
+              </p>
+            </div>
 
-          {/* Quick Counter */}
-          <div className="flex items-center gap-3 font-mono text-xs text-zinc-400">
-            <span className="rounded-full border border-white/10 bg-white/5 px-4 py-1.5">
-              Showing <strong className="text-white">{filteredProducts.length}</strong> Systems
-            </span>
-            {compare.length > 0 && (<button onClick={() => setCompareModalOpen(true)} className="flex items-center gap-2 rounded-full border border-cyan-400/50 bg-cyan-950/40 px-4 py-1.5 text-cyan-300 hover:bg-cyan-400 hover:text-black transition">
-                <Layers className="h-3.5 w-3.5"/>
-                <span>Compare ({compare.length}/3)</span>
-              </button>)}
-          </div>
-        </div>
-
-        {/* Search & Sort Controls */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          {/* Search Input */}
-          <div className="relative w-full sm:max-w-md">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-400"/>
-            <input type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search drones, GCS, controllers, datalinks..." className="w-full rounded-full border border-white/15 bg-white/5 pl-11 pr-10 py-2.5 text-sm text-white placeholder:text-zinc-500 focus:outline-none focus:border-cyan-400 transition"/>
-            {searchQuery && (<button onClick={() => setSearchQuery('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white">
-                <X className="h-4 w-4"/>
-              </button>)}
-          </div>
-
-          {/* Sort Selector */}
-          <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-            <SlidersHorizontal className="h-4 w-4 text-zinc-400"/>
-            <span className="text-xs uppercase text-zinc-400 font-mono">Sort:</span>
-            <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="rounded-full border border-white/15 bg-neutral-900 px-4 py-2 text-xs font-semibold uppercase text-white focus:outline-none focus:border-cyan-400 cursor-pointer">
-              <option value="featured" className="bg-neutral-900">Featured Missions</option>
-              <option value="price-asc" className="bg-neutral-900">Price: Low to High</option>
-              <option value="price-desc" className="bg-neutral-900">Price: High to Low</option>
-              <option value="rating" className="bg-neutral-900">Highest Pilot Rating</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Category Filter Tabs */}
-        <div className="mt-8 flex items-center gap-2 overflow-x-auto no-scrollbar pb-2">
-          {FILTER_TABS.map((tab) => (<button key={tab.id} onClick={() => setSelectedCategory(tab.id)} className={`whitespace-nowrap rounded-full px-5 py-2.5 text-xs font-semibold uppercase tracking-wider transition-all duration-300 ${selectedCategory === tab.id
-                ? 'bg-cyan-400 text-black shadow-[0_0_20px_rgba(0,229,255,0.5)] font-bold'
-                : 'border border-white/15 bg-white/5 text-zinc-300 hover:border-white/30 hover:bg-white/10'}`}>
-              {tab.label}
-            </button>))}
+            {/* Quick Counter */}
+            <div className="flex items-center gap-3 font-mono text-xs text-[#94a3b8]">
+              <span className="rounded-full border border-white/10 bg-[#0b1a2c] px-4 py-1.5">
+                Showing <strong className="text-[#f1f5f9]">{filteredProducts.length}</strong> Systems
+              </span>
+              {compare.length > 0 && (<button type="button" onClick={() => setCompareModalOpen(true)} className="flex items-center gap-2 rounded-full border border-cyan-400/50 bg-cyan-500/15 px-4 py-1.5 text-cyan-300 hover:bg-[#22d3ee] hover:text-[#031018] transition">
+                  <Layers className="h-3.5 w-3.5"/>
+                  <span>Compare ({compare.length}/3)</span>
+                </button>)}
+            </div>
+          </Reveal>
         </div>
       </section>
 
+      {/* Sticky Animated Filter & Search Bar */}
+      <div className="sticky top-16 z-30 border-b border-white/10 bg-[#050b14]/90 backdrop-blur-xl">
+        <div className="mx-auto max-w-7xl px-5 py-4 sm:px-8">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            {/* Search Input */}
+            <div className="relative w-full sm:max-w-md">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-[#94a3b8]"/>
+              <input type="text" value={searchQuery} onChange={(e) => handleSearchChange(e.target.value)} placeholder="Search drones, GCS, controllers, datalinks..." className="w-full rounded-full border border-white/10 bg-[#0b1a2c] pl-11 pr-10 py-2.5 text-sm text-[#f1f5f9] placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 transition"/>
+              {searchQuery && (<button type="button" onClick={() => handleSearchChange('')} className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#94a3b8] hover:text-white" aria-label="Clear search">
+                  <X className="h-4 w-4"/>
+                </button>)}
+            </div>
+
+            {/* Sort Selector */}
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+              <SlidersHorizontal className="h-4 w-4 text-[#94a3b8]"/>
+              <span className="text-xs uppercase text-[#94a3b8] font-mono">Sort:</span>
+              <select value={sortBy} onChange={(e) => handleSortChange(e.target.value)} className="rounded-full border border-white/10 bg-[#0b1a2c] px-4 py-2 text-xs font-semibold uppercase text-[#f1f5f9] focus:outline-none focus:border-cyan-400 cursor-pointer">
+                <option value="featured" className="bg-[#0b1a2c]">Featured Missions</option>
+                <option value="new" className="bg-[#0b1a2c]">New &amp; Flagship</option>
+                <option value="price-asc" className="bg-[#0b1a2c]">Price: Low to High</option>
+                <option value="price-desc" className="bg-[#0b1a2c]">Price: High to Low</option>
+                <option value="rating" className="bg-[#0b1a2c]">Highest Pilot Rating</option>
+              </select>
+            </div>
+          </div>
+
+          {/* Animated Category Filter Tabs with Sliding Pill */}
+          <div className="mt-4 flex items-center gap-2 overflow-x-auto no-scrollbar pb-1">
+            {FILTER_TABS.map((tab) => {
+              const active = selectedCategory === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => handleCategorySelect(tab.id)}
+                  className={`relative whitespace-nowrap rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wider transition-colors ${
+                    active ? 'text-[#031018] font-bold' : 'border border-white/10 bg-[#0b1a2c]/70 text-[#94a3b8] hover:border-white/25 hover:text-[#f1f5f9]'
+                  }`}
+                >
+                  {active && (
+                    <motion.span
+                      layoutId="catalog-filter-pill"
+                      transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+                      className="absolute inset-0 rounded-full bg-gradient-to-r from-[#22d3ee] to-[#0ea5e9] shadow-[0_0_20px_rgba(34,211,238,0.4)]"
+                    />
+                  )}
+                  <span className="relative z-10">{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* Controllers Hub Quick Link Banner when filtering Controllers */}
+      {selectedCategory === 'controllers' && (
+        <div className="mx-auto max-w-7xl px-5 pt-8 sm:px-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-2xl border border-cyan-400/30 bg-[#0b1a2c]/90 p-5">
+            <div className="flex items-start gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-cyan-400/15 text-cyan-300 border border-cyan-400/30">
+                <Gamepad2 className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-[#f1f5f9]">Looking to pair a controller with your aircraft?</p>
+                <p className="text-xs text-[#94a3b8]">Use the interactive 3-step Controller Finder Quiz, Compatibility Matrix, and Hotspot Viewer on our dedicated hub.</p>
+              </div>
+            </div>
+            <Link to="/controllers" className="inline-flex shrink-0 items-center gap-2 rounded-full bg-gradient-to-r from-[#22d3ee] to-[#0ea5e9] px-5 py-2.5 text-xs font-bold uppercase tracking-wider text-[#031018] hover:brightness-110 transition">
+              Open Controllers Hub
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Product Discovery Grid */}
-      <section className="mx-auto max-w-7xl px-5 py-14 sm:px-8">
-        {filteredProducts.length === 0 ? (<div className="rounded-3xl border border-white/10 bg-white/5 p-16 text-center">
-            <Search className="mx-auto h-12 w-12 text-zinc-600"/>
-            <h3 className="mt-4 text-xl font-bold font-display">No Hardware Systems Matching Criteria</h3>
-            <p className="mt-2 text-sm text-zinc-400">Try adjusting your search query or switching categories.</p>
-            <button onClick={() => {
-                setSearchQuery('');
-                setSelectedCategory('all');
-            }} className="mt-6 rounded-full bg-cyan-400 px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-black hover:bg-cyan-300 transition">
+      <section className="mx-auto max-w-7xl px-5 py-12 sm:px-8 pb-28">
+        {filteredProducts.length === 0 ? (<div className="rounded-3xl border border-white/10 bg-[#0b1a2c] p-16 text-center">
+            <Search className="mx-auto h-12 w-12 text-slate-600"/>
+            <h3 className="mt-4 text-xl font-bold font-display text-[#f1f5f9]">No Hardware Systems Matching Criteria</h3>
+            <p className="mt-2 text-sm text-[#94a3b8]">Try adjusting your search query or switching categories.</p>
+            <button type="button" onClick={handleResetFilters} className="mt-6 rounded-full bg-gradient-to-r from-[#22d3ee] to-[#0ea5e9] px-6 py-2.5 text-xs font-bold uppercase tracking-wider text-[#031018] hover:brightness-110 transition">
               Reset Filters
             </button>
-          </div>) : (<div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {filteredProducts.map((product, i) => {
+          </div>) : (<motion.div layout className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <AnimatePresence mode="popLayout">
+            {filteredProducts.map((product) => {
                 const isSaved = wishlist.includes(product.id);
                 const isCompared = compare.includes(product.id);
                 const isAdded = addedItemNotice === product.id;
-                return (<motion.article key={product.id} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: (i % 6) * 0.08 }} className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-neutral-900/60 p-5 transition-all duration-500 hover:border-cyan-400/60 hover:shadow-[0_0_30px_rgba(0,229,255,0.14)]">
+                return (<motion.article layout key={product.id} initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.94 }} transition={{ duration: 0.25 }} className="h-full">
+                  <Tilt maxTilt={4} className="h-full">
+                  <div className="group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-[#0b1a2c]/90 p-5 transition-all duration-300 hover:border-cyan-400/50 hover:shadow-[0_0_30px_rgba(34,211,238,0.14)]">
                   <div>
                     {/* Top Badges & Actions */}
                     <div className="flex items-center justify-between">
@@ -216,35 +310,35 @@ export default function ProductsPage({ onOpenShowcase, }) {
 
                       <div className="flex items-center gap-1.5">
                         {/* Compare toggle */}
-                        <button onClick={() => toggleCompare(product.id)} className={`rounded-full p-1.5 border transition text-xs ${isCompared
-                        ? 'border-cyan-400 bg-cyan-400 text-black'
-                        : 'border-white/10 bg-white/5 text-zinc-400 hover:text-white'}`} title={isCompared ? 'Remove from compare' : 'Add to compare'}>
+                        <motion.button type="button" whileTap={{ scale: 0.85 }} onClick={() => toggleCompare(product.id)} className={`rounded-full p-1.5 border transition text-xs ${isCompared
+                        ? 'border-cyan-400 bg-cyan-400 text-[#031018]'
+                        : 'border-white/10 bg-white/5 text-[#94a3b8] hover:text-white'}`} title={isCompared ? 'Remove from compare' : 'Add to compare'} aria-label={isCompared ? `Remove ${product.name} from compare` : `Compare ${product.name}`}>
                           <Layers className="h-3.5 w-3.5"/>
-                        </button>
+                        </motion.button>
 
                         {/* Wishlist toggle */}
-                        <button onClick={() => toggleWishlist(product.id)} className={`rounded-full p-1.5 border transition ${isSaved
-                        ? 'border-red-500/50 bg-red-500/20 text-red-400'
-                        : 'border-white/10 bg-white/5 text-zinc-400 hover:text-red-400'}`} aria-label="Wishlist">
+                        <motion.button type="button" whileTap={{ scale: 0.85 }} onClick={() => toggleWishlist(product.id)} className={`rounded-full p-1.5 border transition ${isSaved
+                        ? 'border-red-400/50 bg-red-500/20 text-red-400'
+                        : 'border-white/10 bg-white/5 text-[#94a3b8] hover:text-red-400'}`} aria-label={`Wishlist ${product.name}`}>
                           <Heart className={`h-3.5 w-3.5 ${isSaved ? 'fill-current' : ''}`}/>
-                        </button>
+                        </motion.button>
                       </div>
                     </div>
 
                     {/* Image Area with 3D Render & Quick View on Hover */}
-                    <div onClick={() => onOpenShowcase(product.id)} className="relative my-4 aspect-[4/3] overflow-hidden rounded-2xl bg-neutral-950 p-4 cursor-pointer flex items-center justify-center border border-white/5 group-hover:border-white/20 transition-all">
-                      {product.hardwareType === 'drone' ? (<DroneRender product={product} className="h-full w-full max-h-48"/>) : (<img src={product.image} alt={product.name} className="h-full w-full object-contain filter drop-shadow-[0_15px_30px_rgba(0,229,255,0.25)] rounded-xl group-hover:scale-105 transition-transform duration-500"/>)}
+                    <div onClick={() => onOpenShowcase(product.id)} className="relative my-4 aspect-[4/3] overflow-hidden rounded-2xl bg-[#050b14] p-4 cursor-pointer flex items-center justify-center border border-white/5 group-hover:border-white/20 transition-all">
+                      {product.hardwareType === 'drone' ? (<DroneRender product={product} className="h-full w-full max-h-48"/>) : (<img src={product.image} alt={product.name} loading="lazy" className="h-full w-full object-contain filter drop-shadow-[0_15px_30px_rgba(34,211,238,0.22)] rounded-xl group-hover:scale-105 transition-transform duration-500"/>)}
 
                       {/* Hover Overlay with Quick View button */}
                       <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 backdrop-blur-xs flex items-center justify-center gap-3 transition-opacity duration-300">
-                        <button onClick={(e) => {
+                        <button type="button" onClick={(e) => {
                         e.stopPropagation();
                         setQuickViewProduct(product);
-                    }} className="flex items-center gap-1.5 rounded-full bg-white/90 px-3.5 py-1.5 text-xs font-semibold text-black hover:bg-white shadow">
+                    }} className="flex items-center gap-1.5 rounded-full bg-white/95 px-3.5 py-1.5 text-xs font-semibold text-[#031018] hover:bg-white shadow">
                           <Eye className="h-3.5 w-3.5"/>
                           Quick View
                         </button>
-                        <button onClick={() => onOpenShowcase(product.id)} className="flex items-center gap-1.5 rounded-full bg-cyan-400 px-3.5 py-1.5 text-xs font-bold text-black hover:bg-cyan-300 shadow">
+                        <button type="button" onClick={(e) => { e.stopPropagation(); onOpenShowcase(product.id); }} className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#22d3ee] to-[#0ea5e9] px-3.5 py-1.5 text-xs font-bold text-[#031018] hover:brightness-110 shadow">
                           <Sparkles className="h-3.5 w-3.5"/>
                           View Specs
                         </button>
@@ -252,10 +346,10 @@ export default function ProductsPage({ onOpenShowcase, }) {
                     </div>
 
                     {/* Name & Tagline */}
-                    <h3 onClick={() => onOpenShowcase(product.id)} className="font-display text-xl font-bold text-white group-hover:text-cyan-300 transition-colors cursor-pointer">
+                    <h3 onClick={() => onOpenShowcase(product.id)} className="font-display text-xl font-bold text-[#f1f5f9] group-hover:text-cyan-300 transition-colors cursor-pointer">
                       {product.name}
                     </h3>
-                    <p className="mt-1 text-xs text-zinc-400 line-clamp-1 font-light">
+                    <p className="mt-1 text-xs text-[#94a3b8] line-clamp-1">
                       {product.tagline}
                     </p>
 
@@ -355,16 +449,74 @@ export default function ProductsPage({ onOpenShowcase, }) {
                           <span>{isAdded ? 'Added' : 'Add'}</span>
                         </button>)}
 
+                      <Link to={`/contact?type=order&product=${product.id}`} className="rounded-full border border-cyan-400/35 bg-cyan-400/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-cyan-300 hover:bg-cyan-400 hover:text-black transition">
+                        Enquire
+                      </Link>
+
                       {/* Instant View Action */}
-                      <button onClick={() => onOpenShowcase(product.id)} className="rounded-full border border-white/15 bg-white/5 p-2 text-zinc-400 hover:text-white hover:border-white/30 transition" title="View System Details">
+                      <button onClick={() => onOpenShowcase(product.id)} className="rounded-full border border-white/15 bg-white/5 p-2 text-[#94a3b8] hover:text-white hover:border-white/30 transition" title="View System Details">
                         <Eye className="h-3.5 w-3.5"/>
                       </button>
                     </div>
                   </div>
+                  </div>
+                  </Tilt>
                 </motion.article>);
             })}
-          </div>)}
+            </AnimatePresence>
+          </motion.div>)}
       </section>
+
+      {/* STICKY BOTTOM COMPARE TRAY */}
+      <AnimatePresence>
+        {comparedProducts.length > 0 && !compareModalOpen && (
+          <motion.div
+            initial={{ y: 90, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 90, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 320, damping: 28 }}
+            className="fixed bottom-4 left-1/2 z-40 w-[calc(100%-2rem)] max-w-3xl -translate-x-1/2 rounded-2xl border border-cyan-400/40 bg-[#08121f]/95 p-3.5 shadow-[0_20px_50px_rgba(0,0,0,0.65)] backdrop-blur-xl"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-cyan-400 mr-1">
+                  Compare ({comparedProducts.length}/3)
+                </span>
+                {comparedProducts.map((p) => (
+                  <div key={p.id} className="flex items-center gap-1.5 rounded-full border border-white/15 bg-[#0b1a2c] pl-2.5 pr-1.5 py-1 text-xs text-[#f1f5f9]">
+                    <span className="font-semibold truncate max-w-[130px]">{p.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeFromCompare(p.id)}
+                      className="rounded-full p-0.5 text-[#94a3b8] hover:text-red-400 transition"
+                      aria-label={`Remove ${p.name} from compare`}
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center gap-2 ml-auto">
+                <button
+                  type="button"
+                  onClick={() => compare.forEach((cid) => removeFromCompare(cid))}
+                  className="rounded-full border border-white/15 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-[#94a3b8] hover:text-white transition"
+                >
+                  Clear
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCompareModalOpen(true)}
+                  className="flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#22d3ee] to-[#0ea5e9] px-4 py-1.5 text-xs font-bold uppercase tracking-wider text-[#031018] shadow-[0_0_20px_rgba(34,211,238,0.4)] hover:brightness-110 transition"
+                >
+                  <Layers className="h-3.5 w-3.5" />
+                  Compare Matrix
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* QUICK VIEW MODAL */}
       <AnimatePresence>

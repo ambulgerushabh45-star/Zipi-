@@ -1,8 +1,8 @@
-import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { getProduct } from '@/data/products';
 import ProductCard from '@/components/product/ProductCard';
 import SectionHeading from './SectionHeading';
+import { Carousel } from '@/components/motion';
 
 export default function ProductRow({
   id,
@@ -12,10 +12,13 @@ export default function ProductRow({
   productIds,
   viewAllHref = '/products',
 }) {
-  const products = productIds.map(getProduct).filter((p) => Boolean(p));
+  const products = productIds.map(getProduct).filter(Boolean);
 
   return (
-    <section id={id} className="mx-auto max-w-7xl scroll-mt-24 px-5 py-24 sm:px-8 border-t border-[#101B2A]">
+    <section
+      id={id}
+      className="mx-auto max-w-7xl scroll-mt-24 border-t border-white/10 px-5 py-20 sm:px-8"
+    >
       <SectionHeading
         eyebrow={eyebrow}
         title={title}
@@ -23,17 +26,19 @@ export default function ProductRow({
         action={
           <Link
             to={viewAllHref}
-            className="group inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#00C8FF] hover:text-cyan-300 transition-colors"
+            className="inline-flex min-h-[44px] items-center font-mono text-xs font-bold uppercase tracking-wider text-cyan-300 hover:text-sky-300 transition-colors"
           >
-            <span>View Complete Fleet</span>
-            <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+            View Complete Fleet
           </Link>
         }
       />
-      <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {products.map((product, i) => (
-          <ProductCard key={product.id} product={product} index={i} />
-        ))}
+
+      <div className="mt-10">
+        <Carousel
+          items={products}
+          label="Featured drone systems"
+          renderItem={(product, i) => <ProductCard product={product} index={i} />}
+        />
       </div>
     </section>
   );

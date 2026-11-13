@@ -1,11 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Shield,
-  Sprout,
-  Activity,
-  Radio,
   FileText,
   ShoppingBag,
   Zap,
@@ -16,24 +13,31 @@ import {
   Sparkles,
   Rotate3d,
   Images,
-  Layers,
   ArrowRight,
-  Info,
   Check,
-  Package,
   Truck,
   Award,
 } from 'lucide-react';
 import { PRODUCTS, getProduct, CATEGORY_LABELS } from '@/data/products';
 import { formatPrice } from '@/lib/format';
 import { useShop } from '@/hooks/useShop';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { Reveal } from '@/components/motion';
 import StarRating from '@/components/product/StarRating';
 import Interactive3DViewer from '@/components/product/Interactive3DViewer';
 import ProductGallery from '@/components/product/ProductGallery';
+import ControllerInspector from '@/components/product/ControllerInspector';
+import QuantityStepper from '@/components/contact/QuantityStepper';
 import QuoteModal from '@/components/common/QuoteModal';
 import CinematicShowcase from '@/components/showcase/CinematicShowcase';
 import ProductCard from '@/components/product/ProductCard';
 import Footer from '@/components/layout/Footer';
+
+const SPEC_TABS = [
+  { id: 'overview', label: 'Overview' },
+  { id: 'specs', label: 'Specifications' },
+  { id: 'highlights', label: 'Highlights' },
+];
 
 export default function ShowcasePage() {
   const { id } = useParams();
@@ -41,7 +45,9 @@ export default function ShowcasePage() {
   const { addToCart, wishlist, toggleWishlist, notify } = useShop();
 
   const product = getProduct(id || 'aegis-mk4') || PRODUCTS[0];
+  useDocumentTitle(product.name);
   const [activeTab, setActiveTab] = useState('3d'); // '3d' | 'gallery'
+  const [specTab, setSpecTab] = useState('specs'); // 'overview' | 'specs' | 'highlights'
   const [selectedColor, setSelectedColor] = useState(product?.colors?.[0]?.name || 'Standard');
   const [quantity, setQuantity] = useState(1);
   const [quoteModalOpen, setQuoteModalOpen] = useState(false);
@@ -77,7 +83,7 @@ export default function ShowcasePage() {
 
   // Category determination
   const hardwareType = product.hardwareType || 'drone';
-  const categoryLabel = CATEGORY_LABELS[product.category] || 'Aerospace Hardware';
+  const categoryLabel = CATEGORY_LABELS[product.category] || 'Autonomous Hardware';
 
   // Related products from same category or complement
   const relatedProducts = PRODUCTS.filter(
@@ -85,7 +91,7 @@ export default function ShowcasePage() {
   ).slice(0, 4);
 
   return (
-    <main className="min-h-screen bg-[#07111F] text-[#F5F8FC] pt-24 pb-16">
+    <main className="min-h-screen bg-[#050b14] text-[#f1f5f9] pt-24 pb-24 md:pb-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-8">
         {/* ==========================================================
             1. BREADCRUMBS NAVIGATION
@@ -193,9 +199,9 @@ export default function ShowcasePage() {
           </div>
 
           {/* ========================================================
-              RIGHT COLUMN (5 cols): PRODUCT DETAILS & SHOPPING ACTIONS
+              RIGHT COLUMN (5 cols): STICKY PRODUCT DETAILS & ACTIONS
               ======================================================== */}
-          <div className="lg:col-span-5 flex flex-col gap-6 rounded-3xl border border-[#101B2A] bg-[#101B2A]/60 p-6 sm:p-8 backdrop-blur-xl">
+          <div className="lg:col-span-5 lg:sticky lg:top-24 flex flex-col gap-6 rounded-3xl border border-white/10 bg-[#0b1a2c]/85 p-6 sm:p-8 backdrop-blur-xl shadow-2xl">
             {/* Header: Badges & Sector */}
             <div>
               <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
@@ -274,24 +280,32 @@ export default function ShowcasePage() {
                 <label className="text-xs font-mono uppercase tracking-wider text-[#AAB7C7] block mb-2">
                   Tactical Finish: <span className="text-[#F5F8FC] font-bold">{selectedColor}</span>
                 </label>
-                <div className="flex items-center gap-2.5">
-                  {product.colors.map((c) => (
-                    <button
-                      key={c.name}
-                      onClick={() => setSelectedColor(c.name)}
-                      className={`group relative flex h-9 w-9 items-center justify-center rounded-full border-2 transition-all ${
-                        selectedColor === c.name
-                          ? 'border-[#00C8FF] scale-110 shadow-[0_0_12px_rgba(0,200,255,0.6)]'
-                          : 'border-white/20 hover:border-white/40'
-                      }`}
-                      style={{ backgroundColor: c.hex }}
-                      title={c.name}
-                    >
-                      {selectedColor === c.name && (
-                        <Check className="h-4 w-4 text-white drop-shadow-md" />
-                      )}
-                    </button>
-                  ))}
+                <div className="flex items-center gap-3">
+                  {product.colors.map((c) => {
+                    const active = selectedColor === c.name;
+                    return (
+                      <button
+                        type="button"
+                        key={c.name}
+                        onClick={() => setSelectedColor(c.name)}
+                        className="relative flex h-9 w-9 items-center justify-center rounded-full border border-white/25 transition hover:border-white/50"
+                        style={{ backgroundColor: c.hex }}
+                        title={c.name}
+                        aria-label={`Select finish ${c.name}`}
+                      >
+                        {active && (
+                          <motion.span
+                            layoutId="showcase-color-ring"
+                            transition={{ type: 'spring', stiffness: 450, damping: 28 }}
+                            className="absolute -inset-1 rounded-full border-2 border-[#22d3ee] shadow-[0_0_12px_rgba(34,211,238,0.55)]"
+                          />
+                        )}
+                        {active && (
+                          <Check className="relative z-10 h-4 w-4 text-white drop-shadow-md" />
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}
@@ -299,48 +313,34 @@ export default function ShowcasePage() {
             {/* Quantity Selector & Shopping Action Buttons */}
             <div className="space-y-3 pt-2">
               <div className="flex items-center gap-3">
-                {/* Quantity */}
-                <div className="flex h-12 items-center rounded-xl border border-[#101B2A] bg-[#07111F] px-2 text-[#F5F8FC]">
-                  <button
-                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    className="h-8 w-8 rounded-lg text-lg text-[#AAB7C7] hover:bg-[#101B2A] hover:text-white transition flex items-center justify-center"
-                    aria-label="Decrease quantity"
-                  >
-                    -
-                  </button>
-                  <span className="w-10 text-center font-mono font-bold text-sm">
-                    {quantity}
-                  </span>
-                  <button
-                    onClick={() => setQuantity((q) => q + 1)}
-                    className="h-8 w-8 rounded-lg text-lg text-[#AAB7C7] hover:bg-[#101B2A] hover:text-white transition flex items-center justify-center"
-                    aria-label="Increase quantity"
-                  >
-                    +
-                  </button>
-                </div>
+                {/* Animated Quantity Stepper */}
+                <QuantityStepper value={quantity} onChange={setQuantity} min={1} max={99} />
 
-                {/* Primary Add to Cart Button (Warm Orange #FF9B42) */}
-                <button
+                {/* Primary Add to Cart Button */}
+                <motion.button
+                  type="button"
+                  whileTap={{ scale: 0.96 }}
                   onClick={handleAddToCart}
-                  className="flex-1 flex h-12 items-center justify-center gap-2 rounded-xl bg-[#FF9B42] px-6 text-xs sm:text-sm font-black uppercase tracking-wider text-[#07111F] shadow-[0_0_24px_rgba(255,155,66,0.55)] transition-all duration-300 hover:bg-[#ffaa5c] hover:shadow-[0_0_32px_rgba(255,155,66,0.8)] active:scale-95"
+                  className="flex-1 flex h-12 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#22d3ee] to-[#0ea5e9] px-6 text-xs sm:text-sm font-black uppercase tracking-wider text-[#031018] shadow-[0_0_24px_rgba(34,211,238,0.4)] transition hover:brightness-110"
                 >
                   <ShoppingBag className="h-4 w-4 stroke-[2.5]" />
                   <span>Add to Cart</span>
-                </button>
+                </motion.button>
 
                 {/* Wishlist Button */}
-                <button
+                <motion.button
+                  type="button"
+                  whileTap={{ scale: 0.86 }}
                   onClick={() => toggleWishlist(product.id)}
                   className={`flex h-12 w-12 items-center justify-center rounded-xl border transition-all ${
                     isSaved
                       ? 'border-red-500/50 bg-red-500/20 text-red-400'
-                      : 'border-[#101B2A] bg-[#07111F] text-[#AAB7C7] hover:text-red-400 hover:border-red-500/40'
+                      : 'border-white/15 bg-[#08121f] text-[#94a3b8] hover:text-red-400 hover:border-red-500/40'
                   }`}
                   aria-label="Save to Wishlist"
                 >
                   <Heart className={`h-5 w-5 ${isSaved ? 'fill-current' : ''}`} />
-                </button>
+                </motion.button>
               </div>
 
               {/* Secondary Actions: Buy Now & Request a Quote RFP */}
@@ -360,6 +360,21 @@ export default function ShowcasePage() {
                   <FileText className="h-3.5 w-3.5 text-[#00C8FF]" />
                   <span>Request Quote</span>
                 </button>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3 text-center">
+                <Link
+                  to={`/contact?type=order&product=${product.id}`}
+                  className="flex h-10 items-center justify-center rounded-xl border border-cyan-400/35 bg-cyan-400/10 px-3 text-[11px] font-mono font-semibold uppercase tracking-wider text-cyan-300 hover:bg-cyan-400 hover:text-[#07111F] transition"
+                >
+                  Enquire to Order
+                </Link>
+                <Link
+                  to={`/contact?type=dealer&product=${product.id}`}
+                  className="flex h-10 items-center justify-center rounded-xl border border-white/15 bg-white/5 px-3 text-[11px] font-mono font-semibold uppercase tracking-wider text-slate-200 hover:border-cyan-400/50 hover:text-cyan-300 transition"
+                >
+                  Dealer Inquiry
+                </Link>
               </div>
             </div>
 
@@ -383,68 +398,140 @@ export default function ShowcasePage() {
         </div>
 
         {/* ==========================================================
-            3. TECHNICAL SPECIFICATIONS TABLE (ADAPTED TO PRODUCT TYPE)
+            3. TECHNICAL SPECIFICATIONS TABS & DATASHEET
             ========================================================== */}
-        <section className="mt-20 border-t border-[#101B2A] pt-12">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
+        <section className="mt-20 border-t border-white/10 pt-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
             <div>
-              <div className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-widest text-[#00C8FF]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[#00C8FF] animate-pulse" />
+              <div className="flex items-center gap-2 font-mono text-xs font-bold uppercase tracking-widest text-cyan-400">
+                <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse" />
                 <span>ENGINEERING DATASHEET</span>
               </div>
-              <h2 className="mt-2 font-display text-2xl sm:text-4xl font-extrabold text-[#F5F8FC]">
-                Technical Specifications &amp; Parameters
+              <h2 className="mt-2 font-display text-2xl sm:text-4xl font-extrabold text-[#f1f5f9]">
+                System Intelligence &amp; Parameters
               </h2>
             </div>
             <button
+              type="button"
               onClick={() => notify('Downloading certified spec sheet PDF...', 'info')}
-              className="inline-flex items-center gap-2 rounded-xl border border-[#00C8FF]/40 bg-[#101B2A] px-4 py-2 text-xs font-mono text-[#00C8FF] hover:bg-[#00C8FF] hover:text-[#07111F] transition"
+              className="inline-flex items-center gap-2 rounded-xl border border-cyan-400/40 bg-[#0b1a2c] px-4 py-2 text-xs font-mono text-cyan-300 hover:bg-[#22d3ee] hover:text-[#031018] transition"
             >
               <FileText className="h-4 w-4" />
               <span>Download Spec Sheet (PDF)</span>
             </button>
           </div>
 
-          {/* Dynamic Specs Grid adapted to Hardware Type */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {Object.entries(product.specs || {}).map(([key, value]) => {
-              const formattedKey = key
-                .replace(/([A-Z])/g, ' $1')
-                .replace(/^./, (str) => str.toUpperCase());
+          {/* Animated Spec Tabs */}
+          <div className="flex items-center gap-6 border-b border-white/10 mb-8 overflow-x-auto no-scrollbar">
+            {SPEC_TABS.map((t) => {
+              const active = specTab === t.id;
               return (
-                <div
-                  key={key}
-                  className="flex flex-col justify-between rounded-2xl border border-[#101B2A] bg-[#101B2A]/40 p-4 hover:border-[#00C8FF]/40 transition"
+                <button
+                  type="button"
+                  key={t.id}
+                  onClick={() => setSpecTab(t.id)}
+                  className={`relative pb-3 text-sm font-semibold whitespace-nowrap transition-colors ${
+                    active ? 'text-[#f1f5f9]' : 'text-[#94a3b8] hover:text-[#f1f5f9]'
+                  }`}
                 >
-                  <span className="font-mono text-[10px] uppercase tracking-wider text-[#AAB7C7]">
-                    {formattedKey}
-                  </span>
-                  <span className="font-display text-sm sm:text-base font-bold text-[#F5F8FC] mt-1">
-                    {String(value)}
-                  </span>
-                </div>
+                  {t.label}
+                  {active && (
+                    <motion.span
+                      layoutId="showcase-spec-tab"
+                      transition={{ type: 'spring', stiffness: 420, damping: 30 }}
+                      className="absolute inset-x-0 bottom-0 h-0.5 rounded-full bg-gradient-to-r from-[#22d3ee] to-[#0ea5e9]"
+                    />
+                  )}
+                </button>
               );
             })}
           </div>
+
+          {specTab === 'overview' && (
+            <Reveal className="grid gap-6 md:grid-cols-12 rounded-3xl border border-white/10 bg-[#0b1a2c]/70 p-6 sm:p-8">
+              <div className="md:col-span-7 space-y-4">
+                <p className="text-xs font-mono uppercase tracking-widest text-cyan-400">SYSTEM BRIEF</p>
+                <p className="text-base text-[#f1f5f9] leading-relaxed">{product.description}</p>
+                <p className="text-xs text-[#94a3b8] leading-relaxed">
+                  Engineered by ZIPI Drones &amp; Controls for non-weaponized ISR, precision agriculture, and industrial field operations. Ready for rapid enterprise fleet integration.
+                </p>
+              </div>
+              <div className="md:col-span-5 grid grid-cols-2 gap-3">
+                {Object.entries(product.specs || {}).slice(0, 4).map(([k, v]) => (
+                  <div key={k} className="rounded-2xl border border-white/10 bg-[#08121f] p-3.5">
+                    <span className="block font-mono text-[10px] uppercase tracking-wider text-[#94a3b8]">
+                      {k.replace(/([A-Z])/g, ' $1')}
+                    </span>
+                    <span className="mt-1 block font-display text-sm font-bold text-[#f1f5f9]">
+                      {String(v)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+          )}
+
+          {specTab === 'specs' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Object.entries(product.specs || {}).map(([key, value]) => {
+                const formattedKey = key
+                  .replace(/([A-Z])/g, ' $1')
+                  .replace(/^./, (str) => str.toUpperCase());
+                return (
+                  <div
+                    key={key}
+                    className="flex flex-col justify-between rounded-2xl border border-white/10 bg-[#0b1a2c]/60 p-4 hover:border-cyan-400/40 transition"
+                  >
+                    <span className="font-mono text-[10px] uppercase tracking-wider text-[#94a3b8]">
+                      {formattedKey}
+                    </span>
+                    <span className="font-display text-sm sm:text-base font-bold text-[#f1f5f9] mt-1">
+                      {String(value)}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {specTab === 'highlights' && (
+            <div className="grid gap-4 md:grid-cols-2">
+              {(product.highlights || []).map((h, i) => (
+                <div key={i} className="flex items-start gap-3 rounded-2xl border border-white/10 bg-[#0b1a2c]/70 p-4">
+                  <CheckCircle2 className="h-5 w-5 text-cyan-400 shrink-0 mt-0.5" />
+                  <span className="text-sm text-[#f1f5f9] leading-relaxed">{h}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* ==========================================================
-            4. RELATED AEROSPACE SYSTEMS ROW
+            3B. CONTROLLER HOTSPOT INSPECTOR & KIT BUILDER
+            ========================================================== */}
+        {hardwareType === 'controller' && (
+          <section id="controller-inspector" className="mt-20 border-t border-white/10 pt-12">
+            <ControllerInspector controller={product} />
+          </section>
+        )}
+
+        {/* ==========================================================
+            4. RELATED FLEET SYSTEMS ROW
             ========================================================== */}
         {relatedProducts.length > 0 && (
-          <section className="mt-20 border-t border-[#101B2A] pt-12">
+          <Reveal as="section" className="mt-20 border-t border-white/10 pt-12">
             <div className="flex items-center justify-between mb-8">
               <div>
-                <span className="text-xs font-mono font-bold uppercase tracking-widest text-[#00C8FF]">
-                  INTEROPERABLE FLEET
+                <span className="text-xs font-mono font-bold uppercase tracking-widest text-cyan-400">
+                  FREQUENTLY PAIRED
                 </span>
-                <h3 className="mt-2 font-display text-2xl sm:text-3xl font-extrabold text-[#F5F8FC]">
-                  Complementary Aerospace Hardware
+                <h3 className="mt-2 font-display text-2xl sm:text-3xl font-extrabold text-[#f1f5f9]">
+                  Complementary Autonomous Hardware
                 </h3>
               </div>
               <Link
                 to="/products"
-                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-mono uppercase text-[#00C8FF] hover:underline"
+                className="hidden sm:inline-flex items-center gap-1.5 text-xs font-mono uppercase text-cyan-400 hover:underline"
               >
                 <span>View Full Catalogue</span>
                 <ArrowRight className="h-3.5 w-3.5" />
@@ -456,8 +543,33 @@ export default function ShowcasePage() {
                 <ProductCard key={p.id} product={p} index={idx} />
               ))}
             </div>
-          </section>
+          </Reveal>
         )}
+      </div>
+
+      {/* Mobile Sticky Enquire & Add Bar */}
+      <div className="md:hidden fixed inset-x-0 bottom-0 z-40 border-t border-white/15 bg-[#050b14]/95 px-4 py-3 backdrop-blur-xl">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-mono uppercase text-[#94a3b8] truncate max-w-[140px]">{product.name}</p>
+            <p className="font-display text-base font-bold text-[#f1f5f9]">{formatPrice(product.price)}</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link
+              to={`/contact?type=order&product=${product.id}`}
+              className="rounded-full border border-cyan-400/50 bg-cyan-400/10 px-4 py-2 text-xs font-bold uppercase tracking-wider text-cyan-300"
+            >
+              Enquire
+            </Link>
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              className="rounded-full bg-gradient-to-r from-[#22d3ee] to-[#0ea5e9] px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#031018]"
+            >
+              Add to Cart
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Quote Request Modal */}

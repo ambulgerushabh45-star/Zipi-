@@ -59,6 +59,46 @@ export default function Interactive3DViewer({
   const frameIndex = Math.floor((normalizedAngle / 360) * totalFrames) % totalFrames;
   const currentFrameUrl = frames[frameIndex] || product?.image;
 
+  // Lazy preload remaining turntable frames after initial idle or first interaction
+  const [hasInteracted, setHasInteracted] = useState(false);
+  const preloadedUrlsRef = useRef(new Set());
+  const framesKey = frames.join('|');
+  useEffect(() => {
+    const list = framesKey ? framesKey.split('|') : [];
+    if (list.length <= 1) return undefined;
+    let cancelled = false;
+    const preloadAll = () => {
+      if (cancelled) return;
+      list.forEach((src) => {
+        if (!src || preloadedUrlsRef.current.has(src)) return;
+        preloadedUrlsRef.current.add(src);
+        const img = new Image();
+        img.decoding = 'async';
+        img.src = src;
+      });
+    };
+
+    if (hasInteracted) {
+      preloadAll();
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    const timer = window.setTimeout(() => {
+      if (typeof window.requestIdleCallback === 'function') {
+        window.requestIdleCallback(preloadAll);
+      } else {
+        preloadAll();
+      }
+    }, 900);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [framesKey, hasInteracted]);
+
   // Calculate micro-perspective tilt between frames for ultra-smooth 3D depth
   const degreesPerFrame = 360 / totalFrames;
   const subAngle = ((normalizedAngle % degreesPerFrame) - degreesPerFrame / 2) * 0.45;
@@ -84,6 +124,7 @@ export default function Interactive3DViewer({
   // Pointer drag events (Mouse & Touch single finger)
   const handlePointerDown = (e) => {
     if (e.target.closest('button')) return;
+    setHasInteracted(true);
     setIsDragging(true);
     dragStartRef.current = {
       x: e.clientX,
@@ -187,13 +228,14 @@ export default function Interactive3DViewer({
         exit={{ opacity: 0, scale: 0.8 }}
         className="fixed bottom-6 right-6 z-50 flex items-center gap-3 rounded-2xl border border-[#00C8FF]/50 bg-[#07111F]/95 p-3.5 shadow-[0_15px_40px_rgba(0,0,0,0.85)] backdrop-blur-xl text-[#F5F8FC]"
       >
-        <div className="relative h-14 w-14 rounded-xl bg-[#101B2A] flex items-center justify-center overflow-hidden border border-[#101B2A]">
+        <div className="relative h-14 w-14 rounded-xl bg-[#0b1a2c] flex items-center justify-center overflow-hidden border border-white/10">
           <img
             src={currentFrameUrl}
             alt={product?.name}
+            loading="lazy"
             className="h-12 w-12 object-contain"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#07111F]/60 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#050b14]/60 to-transparent pointer-events-none" />
         </div>
         <div>
           <div className="flex items-center gap-1.5 font-mono text-[10px] text-[#00C8FF] uppercase tracking-wider font-bold">
@@ -221,8 +263,8 @@ export default function Interactive3DViewer({
   // ==========================================================
   const containerClasses =
     viewState === 'maximized'
-      ? 'fixed inset-0 z-[110] bg-[#07111F]/98 backdrop-blur-2xl p-4 sm:p-8 flex flex-col justify-between'
-      : `relative w-full rounded-3xl border border-[#101B2A] bg-[#07111F] overflow-hidden select-none ${className}`;
+      ? 'fixed inset-0 z-[110] bg-[#050b14]/98 backdrop-blur-2xl p-4 sm:p-8 flex flex-col justify-between'
+      : `relative w-full rounded-3xl border border-white/10 bg-[#08121f] overflow-hidden select-none ${className}`;
 
   return (
     <div

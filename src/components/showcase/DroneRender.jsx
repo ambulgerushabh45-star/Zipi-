@@ -135,7 +135,7 @@ export default function DroneRender({ product, selectedColor, className = '', vi
       <div className="mt-4 flex items-center gap-3 font-mono text-[10px] text-zinc-400">
         <span className="flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse"/>
-          {isDefence ? 'DEFENCE ISR' : isAgri ? 'PRECISION AGRI' : 'AEROSPACE FLEET'}
+          {isDefence ? 'DEFENCE ISR' : isAgri ? 'PRECISION AGRI' : 'AUTONOMOUS FLEET'}
         </span>
         <span>{'//'}</span>
         <span>ID: {product.id.toUpperCase()}</span>

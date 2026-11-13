@@ -1,67 +1,64 @@
-import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown, X, User, ShoppingBag, Heart } from 'lucide-react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { X, User, ShoppingBag, Heart } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { NAV_ITEMS } from '@/data/navigation';
 import { useShop } from '@/hooks/useShop';
 import Logo from './Logo';
 
-const EASE = [0.22, 1, 0.36, 1];
-
 export default function MobileMenu({ open, onClose, onOpenCart, onOpenAccount }) {
   const [expandedId, setExpandedId] = useState(null);
   const { cartCount, wishlist } = useShop();
+  const shouldReduceMotion = useReducedMotion();
 
   useEffect(() => {
     if (!open) return;
     document.body.style.overflow = 'hidden';
+    const onKey = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
     return () => {
       document.body.style.overflow = '';
+      window.removeEventListener('keydown', onKey);
     };
-  }, [open]);
+  }, [open, onClose]);
 
   return (
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[85] flex flex-col overflow-y-auto bg-[#07111F] px-6 py-6 text-[#F5F8FC] md:hidden"
-          initial={{ opacity: 0, y: -12 }}
+          className="fixed inset-0 z-[85] flex flex-col overflow-y-auto bg-[#07111d] px-6 py-6 text-[#F8FAFC] lg:hidden"
+          initial={shouldReduceMotion ? false : { opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.3, ease: EASE }}
+          exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
+          transition={{ duration: shouldReduceMotion ? 0 : 0.15, ease: 'easeOut' }}
         >
-          <div className="flex h-12 items-center justify-between border-b border-[#101B2A] pb-4">
+          <div className="flex h-12 items-center justify-between border-b border-white/10 pb-4">
             <Logo tone="light" />
             <button
+              type="button"
               onClick={onClose}
-              className="rounded-full p-2 text-[#AAB7C7] hover:bg-[#101B2A] hover:text-[#F5F8FC]"
+              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-slate-300 hover:bg-[#101B2A] hover:text-white outline-none focus-visible:ring-2 focus-visible:ring-[#00C8FF]"
               aria-label="Close menu"
             >
               <X className="h-6 w-6" />
             </button>
           </div>
 
-          <nav className="mt-8 flex flex-col space-y-1" aria-label="Mobile">
-            {NAV_ITEMS.map((item, i) => {
-              const delay = 0.05 + i * 0.04;
-
+          <nav className="mt-6 flex flex-col space-y-1" aria-label="Mobile">
+            {NAV_ITEMS.map((item) => {
               if (!item.menu) {
                 return (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, x: -16 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay }}
-                    className="border-b border-white/5 py-2"
-                  >
+                  <div key={item.id} className="border-b border-white/10 py-1">
                     <Link
                       to={item.to}
                       onClick={onClose}
-                      className="block py-3 font-display text-2xl font-bold text-[#F5F8FC] transition-colors hover:text-[#00C8FF]"
+                      className="flex min-h-[44px] items-center py-2.5 font-display text-xl font-bold text-[#F8FAFC] transition-colors hover:text-[#00C8FF] outline-none focus-visible:ring-2 focus-visible:ring-[#00C8FF]"
                     >
                       {item.label}
                     </Link>
-                  </motion.div>
+                  </div>
                 );
               }
 
@@ -69,78 +66,69 @@ export default function MobileMenu({ open, onClose, onOpenCart, onOpenAccount })
               const expanded = expandedId === item.id;
 
               return (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, x: -16 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay }}
-                  className="border-b border-white/5 py-2"
-                >
+                <div key={item.id} className="border-b border-white/10 py-1">
                   <button
                     type="button"
                     aria-expanded={expanded}
                     onClick={() => setExpandedId(expanded ? null : item.id)}
-                    className="flex w-full items-center justify-between py-3 text-left font-display text-2xl font-bold text-[#F5F8FC]"
+                    className={`flex min-h-[44px] w-full items-center justify-between py-2.5 text-left font-display text-xl font-bold transition-colors outline-none focus-visible:ring-2 focus-visible:ring-[#00C8FF] ${
+                      expanded ? 'text-[#00C8FF]' : 'text-[#F8FAFC]'
+                    }`}
                   >
                     <span>{item.label}</span>
-                    <motion.span
-                      animate={{ rotate: expanded ? 180 : 0 }}
-                      transition={{ duration: 0.3, ease: EASE }}
-                    >
-                      <ChevronDown className="h-5 w-5 text-[#AAB7C7]" />
-                    </motion.span>
+                    <span className="font-mono text-base font-bold text-cyan-300" aria-hidden="true">
+                      {expanded ? '−' : '+'}
+                    </span>
                   </button>
 
-                  <AnimatePresence initial={false}>
-                    {expanded && (
-                      <motion.div
-                        key="links"
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: 'auto', opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.3, ease: EASE }}
-                        className="overflow-hidden pl-2"
-                      >
-                        <ul className="flex flex-col pb-3 space-y-1">
-                          {menu.links.map((link) => (
-                            <li key={link.label}>
-                              <Link
-                                to={link.to}
-                                onClick={onClose}
-                                className="block py-2 text-sm text-[#AAB7C7] transition-colors hover:text-[#00C8FF]"
-                              >
-                                {link.label}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
+                  {expanded && (
+                    <div className="pl-2 pb-2">
+                      <ul className="flex flex-col space-y-1">
+                        {menu.links.map((link) => (
+                          <li key={link.label}>
+                            <Link
+                              to={link.to}
+                              onClick={onClose}
+                              className="flex min-h-[44px] items-center justify-between rounded-lg px-2 py-2 text-sm text-slate-200 transition-colors hover:bg-[#101B2A] hover:text-[#00C8FF] outline-none focus-visible:ring-2 focus-visible:ring-[#00C8FF]"
+                            >
+                              <span>{link.label}</span>
+                              {link.badge && (
+                                <span className="rounded-full border border-cyan-400/30 bg-cyan-400/10 px-2 py-0.5 font-mono text-[10px] text-cyan-300">
+                                  {link.badge}
+                                </span>
+                              )}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
               );
             })}
           </nav>
 
-          {/* Account & Cart Quick Access for Mobile Menu */}
-          <div className="mt-6 pt-4 border-t border-[#101B2A] flex flex-col space-y-2">
+          {/* Account & Cart Quick Access */}
+          <div className="mt-6 pt-4 border-t border-white/10 flex flex-col space-y-1">
             <button
+              type="button"
               onClick={() => {
                 onClose();
                 onOpenAccount?.();
               }}
-              className="flex items-center gap-3 py-2.5 text-base font-bold text-[#F5F8FC] hover:text-[#00C8FF] transition-colors"
+              className="flex min-h-[44px] items-center gap-3 py-2 text-base font-bold text-[#F8FAFC] hover:text-[#00C8FF] transition-colors"
             >
               <User className="h-5 w-5 text-[#00C8FF]" />
               <span>Sign In / Account</span>
             </button>
 
             <button
+              type="button"
               onClick={() => {
                 onClose();
                 onOpenCart?.();
               }}
-              className="flex items-center justify-between py-2.5 text-base font-bold text-[#F5F8FC] hover:text-[#00C8FF] transition-colors"
+              className="flex min-h-[44px] items-center justify-between py-2 text-base font-bold text-[#F8FAFC] hover:text-[#00C8FF] transition-colors"
             >
               <span className="flex items-center gap-3">
                 <ShoppingBag className="h-5 w-5 text-[#00C8FF]" />
@@ -156,7 +144,7 @@ export default function MobileMenu({ open, onClose, onOpenCart, onOpenAccount })
             <Link
               to="/wishlist"
               onClick={onClose}
-              className="flex items-center justify-between py-2.5 text-base font-bold text-[#F5F8FC] hover:text-[#00C8FF] transition-colors"
+              className="flex min-h-[44px] items-center justify-between py-2 text-base font-bold text-[#F8FAFC] hover:text-[#00C8FF] transition-colors"
             >
               <span className="flex items-center gap-3">
                 <Heart className="h-5 w-5 text-[#FF9B42]" />
@@ -170,10 +158,10 @@ export default function MobileMenu({ open, onClose, onOpenCart, onOpenAccount })
             </Link>
           </div>
 
-          <div className="mt-auto pt-6 border-t border-[#101B2A] flex items-center justify-between text-xs font-mono text-[#AAB7C7]">
-            <span>ZIPI AEROSPACE // VER. 4.8</span>
-            <Link to="/contact" onClick={onClose} className="text-[#00C8FF] hover:underline">
-              Support Desk →
+          <div className="mt-auto pt-6 border-t border-white/10 flex items-center justify-between text-xs font-mono text-slate-300">
+            <span>ZIPI DRONES &amp; CONTROLS</span>
+            <Link to="/contact" onClick={onClose} className="text-[#00C8FF] hover:underline py-2">
+              Support Desk
             </Link>
           </div>
         </motion.div>

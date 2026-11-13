@@ -29,7 +29,7 @@ export default function AccountModal({ open, onClose, }) {
               </div>
               <div>
                 <span className="text-[10px] font-mono uppercase tracking-widest text-cyan-400">
-                  ZIPI AEROSPACE PORTAL
+                  ZIPI DRONES &amp; CONTROLS PORTAL
                 </span>
                 <h3 className="text-xl font-bold font-display">
                   {isLogin ? 'Operator Sign In' : 'Register Operator Account'}
