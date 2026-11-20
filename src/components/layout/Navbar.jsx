@@ -20,9 +20,20 @@ export default function Navbar({ onOpenCart }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { activeId, toggle, open, close } = useMegaMenu();
+  const [utcTime, setUtcTime] = useState('');
+  const { activeId, toggle, open, close, clearTimer } = useMegaMenu();
   const shouldReduceMotion = useReducedMotion();
   const { scrollY } = useScroll();
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setUtcTime(now.toISOString().slice(11, 19) + ' UTC');
+    };
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   const headerRef = useRef(null);
   const panelRef = useRef(null);
@@ -87,22 +98,46 @@ export default function Navbar({ onOpenCart }) {
   }, [activeId, close, closeWithFocus]);
 
   const iconBtn =
-    'relative flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-[#cbd5e1] transition-colors duration-150 hover:bg-[#112640] hover:text-[#f1f5f9] outline-none focus-visible:ring-2 focus-visible:ring-cyan-400';
+    'relative flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-[#AAB7C6] transition-all duration-200 hover:bg-[#162438] hover:text-[#00C8E8] active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-[#00C8E8]';
 
-  const topOffsetClass = scrolled ? 'top-16' : 'top-20';
+  const topOffsetClass = scrolled ? 'top-16' : 'top-20 sm:top-[112px]';
 
   return (
     <>
       <header
         ref={headerRef}
-        className={`fixed inset-x-0 top-0 z-50 border-b border-white/10 transition-colors duration-200 ${
+        className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
           activeId
-            ? 'bg-[#08121f]'
+            ? 'bg-[#101B2B]/98 border-b border-[#AAB7C6]/20 shadow-[0_16px_45px_rgba(0,0,0,0.6)]'
             : scrolled
-              ? 'bg-[#050b14]/90 backdrop-blur-xl shadow-[0_12px_32px_rgba(0,0,0,0.45)]'
-              : 'bg-[#050b14]/80 backdrop-blur-md'
+              ? 'bg-[#101B2B]/90 backdrop-blur-xl border-b border-[#AAB7C6]/20 shadow-[0_12px_32px_rgba(0,0,0,0.4)]'
+              : 'bg-transparent border-b border-white/5'
         }`}
       >
+        {/* Top Tactical Mission Status Bar */}
+        {!scrolled && (
+          <div className="border-b border-white/5 bg-[#080F1B]/95 px-4 py-1.5 text-[10px] font-mono text-[#AAB7C6] backdrop-blur-md hidden sm:block">
+            <div className="mx-auto flex max-w-7xl items-center justify-between">
+              <div className="flex items-center gap-3">
+                <span className="flex items-center gap-1.5 font-bold text-[#00C8E8]">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#00C8E8] animate-pulse shadow-[0_0_8px_#00C8E8]" />
+                  <span>FLEET TELEMETRY // ACTIVE</span>
+                </span>
+                <span className="text-white/20">|</span>
+                <span className="text-slate-300">NON-WEAPONIZED ISR DEFENCE &amp; PRECISION AGRI</span>
+              </div>
+              <div className="flex items-center gap-4 text-slate-300">
+                <span className="flex items-center gap-1.5">
+                  <span className="text-[#00C8E8] font-bold">C2 LINK:</span>
+                  <span>AES-256 ENCRYPTED</span>
+                </span>
+                <span className="text-white/20">|</span>
+                <span className="font-bold text-[#00C8E8]">{utcTime || '12:00:00 UTC'}</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div
           className={`mx-auto flex max-w-7xl items-center gap-3 sm:gap-5 px-4 sm:px-8 transition-[height] duration-200 ${
             scrolled ? 'h-16' : 'h-20'
@@ -119,7 +154,7 @@ export default function Navbar({ onOpenCart }) {
             registerTriggerRef={registerTriggerRef}
           />
 
-          <div className="ml-auto flex items-center gap-1 sm:gap-1.5">
+          <div className="ml-auto flex items-center gap-1 sm:gap-2">
             <button
               type="button"
               onClick={() => {
@@ -138,11 +173,11 @@ export default function Navbar({ onOpenCart }) {
                 close();
                 setAccountOpen(true);
               }}
-              className="relative inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-transparent px-3 py-2 text-xs font-semibold uppercase tracking-wider text-[#cbd5e1] transition-all duration-150 hover:border-white/10 hover:bg-[#112640] hover:text-cyan-300 outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+              className="relative inline-flex min-h-[44px] items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3.5 py-2 text-xs font-semibold uppercase tracking-wider text-[#F5F8FC] transition-all duration-200 hover:border-[#00C8E8] hover:bg-[#162438] hover:text-[#00C8E8] active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-[#00C8E8]"
               aria-label="Sign In or Account"
             >
               <User className="h-4 w-4" />
-              <span className="hidden xl:inline">Sign In / Account</span>
+              <span className="hidden xl:inline">Account</span>
             </button>
 
             <Link
@@ -167,7 +202,7 @@ export default function Navbar({ onOpenCart }) {
                 close();
                 onOpenCart?.();
               }}
-              className="relative inline-flex min-h-[44px] items-center gap-2 rounded-full border border-cyan-400/40 bg-[#0b1a2c] px-3.5 py-2 text-xs font-bold uppercase tracking-wider text-cyan-300 transition-all duration-150 hover:border-cyan-400 hover:bg-gradient-to-br hover:from-[#22d3ee] hover:to-[#0ea5e9] hover:text-[#031018] hover:shadow-[0_0_20px_rgba(34,211,238,0.5)] outline-none focus-visible:ring-2 focus-visible:ring-cyan-400"
+              className="relative inline-flex min-h-[44px] items-center gap-2 rounded-full border border-[#00C8E8]/40 bg-[#162438] px-4 py-2 text-xs font-bold uppercase tracking-wider text-[#00C8E8] shadow-[0_0_18px_rgba(0,200,232,0.2)] transition-all duration-200 hover:border-[#00C8E8] hover:bg-[#00C8E8] hover:text-[#080F1B] hover:shadow-[0_0_24px_rgba(0,200,232,0.5)] active:translate-y-[1px] active:scale-95 outline-none focus-visible:ring-2 focus-visible:ring-[#00C8E8]"
               aria-label={`Cart, ${cartCount} items`}
             >
               <ShoppingBag className="h-4 w-4" />
@@ -216,8 +251,10 @@ export default function Navbar({ onOpenCart }) {
               id={activeItem.id}
               menu={activeMenu}
               topClass={topOffsetClass}
-              onNavigate={close}
+              onNavigate={() => close(true)}
               onEscape={closeWithFocus}
+              onMouseEnter={clearTimer}
+              onMouseLeave={() => close(false)}
             />
           </div>
         )}

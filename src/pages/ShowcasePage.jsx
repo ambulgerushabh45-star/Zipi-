@@ -130,14 +130,17 @@ export default function ShowcasePage() {
               <div className="inline-flex rounded-xl bg-[#101B2A] p-1 border border-white/5">
                 <button
                   onClick={() => setActiveTab('3d')}
-                  className={`flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-xs font-semibold transition ${
+                  className={`flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-bold tracking-wide transition-all ${
                     activeTab === '3d'
-                      ? 'bg-[#00C8FF] text-[#07111F] shadow-[0_0_15px_rgba(0,200,255,0.5)] font-bold'
-                      : 'text-[#AAB7C7] hover:text-[#F5F8FC]'
+                      ? 'bg-[#00C8E8] text-[#080F1B] shadow-[0_0_18px_rgba(0,200,232,0.6)] font-bold'
+                      : 'text-[#AAB7C6] hover:text-[#F5F8FC]'
                   }`}
                 >
                   <Rotate3d className="h-4 w-4" />
-                  <span>3D Turntable (360°)</span>
+                  <span>360° VIEW</span>
+                  <span className="rounded bg-black/25 px-1.5 py-0.5 text-[9px] uppercase font-mono tracking-wider">
+                    Interactive
+                  </span>
                 </button>
                 <button
                   onClick={() => setActiveTab('gallery')}

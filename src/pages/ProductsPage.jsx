@@ -295,7 +295,7 @@ export default function ProductsPage({ onOpenShowcase, }) {
                 const isAdded = addedItemNotice === product.id;
                 return (<motion.article layout key={product.id} initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.94 }} transition={{ duration: 0.25 }} className="h-full">
                   <Tilt maxTilt={4} className="h-full">
-                  <div className="group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-[#0b1a2c]/90 p-5 transition-all duration-300 hover:border-cyan-400/50 hover:shadow-[0_0_30px_rgba(34,211,238,0.14)]">
+                  <div className="hud-bracket group relative flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-[#0b1a2c]/90 p-5 transition-all duration-300 hover:border-cyan-400/50 hover:shadow-[0_0_35px_rgba(34,211,238,0.18)]">
                   <div>
                     {/* Top Badges & Actions */}
                     <div className="flex items-center justify-between">

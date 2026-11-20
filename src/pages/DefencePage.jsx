@@ -452,7 +452,7 @@ export default function DefencePage({ onOpenShowcase }) {
             animate={{ x: 0 }}
             transition={{ duration: shouldReduceMotion ? 0 : 0.25, ease: 'easeOut' }}
             role="tabpanel"
-            className="rounded-3xl border border-[#60a5fa]/30 bg-[#0b1a2c] p-6 sm:p-10 space-y-10 shadow-2xl"
+            className="hud-bracket rounded-3xl border border-[#60a5fa]/30 bg-[#0b1a2c] p-6 sm:p-10 space-y-10 shadow-[0_0_45px_rgba(96,165,250,0.12)]"
           >
             <div className="grid gap-8 lg:grid-cols-12 items-center">
               <div className="lg:col-span-6 space-y-4">

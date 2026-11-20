@@ -113,19 +113,33 @@ export default function CartDrawer({ open, onClose }) {
                   </AnimatePresence>
                 </ul>
 
-                <footer className="space-y-4 border-t border-white/10 bg-[#050b14] px-6 py-5">
+                <footer className="space-y-4 border-t border-[#AAB7C6]/20 bg-[#080F1B] px-6 py-5">
                   <div className="flex items-center justify-between text-base">
-                    <span className="text-[#94a3b8]">Order Subtotal</span>
-                    <span className="font-display text-2xl font-bold text-[#f1f5f9]">{formatPrice(cartTotal)}</span>
+                    <span className="text-[#AAB7C6]">Order Subtotal</span>
+                    <span className="font-display text-2xl font-bold text-[#F5F8FC]">{formatPrice(cartTotal)}</span>
                   </div>
-                  <div className="flex items-center gap-1.5 text-[11px] text-[#94a3b8]">
-                    <ShieldCheck className="h-3.5 w-3.5 text-cyan-400"/>
-                    <span>Free secured hardware freight &amp; encrypted checkout</span>
+                  <div className="flex items-center gap-1.5 text-[11px] text-[#AAB7C6]">
+                    <ShieldCheck className="h-3.5 w-3.5 text-[#00C8E8]"/>
+                    <span>Free insured hardware delivery &amp; encrypted checkout</span>
                   </div>
-                  <motion.button type="button" whileTap={{ scale: 0.97 }} onClick={checkout} className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#22d3ee] to-[#0ea5e9] py-3.5 text-xs font-bold uppercase tracking-wider text-[#031018] shadow-[0_0_24px_rgba(34,211,238,0.4)] hover:brightness-110 transition">
-                    <span>Proceed to Checkout</span>
-                    <ArrowRight className="h-4 w-4"/>
-                  </motion.button>
+                  <div className="grid grid-cols-2 gap-3 pt-1">
+                    <Link
+                      to="/checkout"
+                      onClick={onClose}
+                      className="flex items-center justify-center gap-1.5 rounded-xl border border-[#AAB7C6]/30 bg-white/5 py-3 text-xs font-bold uppercase tracking-wider text-[#F5F8FC] hover:border-[#00C8E8] hover:text-[#00C8E8] transition"
+                    >
+                      <span>View Cart</span>
+                    </Link>
+                    <motion.button
+                      type="button"
+                      whileTap={{ scale: 0.97 }}
+                      onClick={checkout}
+                      className="flex items-center justify-center gap-2 rounded-xl bg-[#00C8E8] py-3 text-xs font-black uppercase tracking-wider text-[#080F1B] shadow-[0_0_20px_rgba(0,200,232,0.4)] hover:brightness-105 active:scale-95 transition"
+                    >
+                      <span>Checkout</span>
+                      <ArrowRight className="h-4 w-4"/>
+                    </motion.button>
+                  </div>
                 </footer>
               </>)}
           </motion.aside>

@@ -431,7 +431,7 @@ export default function AgriculturePage({ onOpenShowcase }) {
             animate={{ x: 0 }}
             transition={{ duration: shouldReduceMotion ? 0 : 0.25, ease: 'easeOut' }}
             role="tabpanel"
-            className="rounded-3xl border border-[#4ade80]/30 bg-[#0b1a2c] p-6 sm:p-10 space-y-10 shadow-2xl"
+            className="hud-bracket rounded-3xl border border-[#4ade80]/30 bg-[#0b1a2c] p-6 sm:p-10 space-y-10 shadow-[0_0_45px_rgba(74,222,128,0.12)]"
           >
             <div className="grid gap-8 lg:grid-cols-12 items-center">
               <div className="lg:col-span-6 space-y-4">

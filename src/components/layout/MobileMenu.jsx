@@ -28,7 +28,7 @@ export default function MobileMenu({ open, onClose, onOpenCart, onOpenAccount })
     <AnimatePresence>
       {open && (
         <motion.div
-          className="fixed inset-0 z-[85] flex flex-col overflow-y-auto bg-[#07111d] px-6 py-6 text-[#F8FAFC] lg:hidden"
+          className="fixed inset-0 z-[85] flex flex-col overflow-y-auto bg-[#080F1B] px-6 py-6 text-[#F5F8FC] lg:hidden"
           initial={shouldReduceMotion ? false : { opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
@@ -39,7 +39,7 @@ export default function MobileMenu({ open, onClose, onOpenCart, onOpenAccount })
             <button
               type="button"
               onClick={onClose}
-              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-slate-300 hover:bg-[#101B2A] hover:text-white outline-none focus-visible:ring-2 focus-visible:ring-[#00C8FF]"
+              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-slate-300 hover:bg-[#101B2B] hover:text-white outline-none focus-visible:ring-2 focus-visible:ring-[#00C8E8]"
               aria-label="Close menu"
             >
               <X className="h-6 w-6" />

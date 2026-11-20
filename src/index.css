@@ -3,21 +3,30 @@
 @tailwind utilities;
 
 :root {
-  --mission-bg: #050b14;
-  --mission-bg-alt: #08121f;
-  --mission-surface: #0b1a2c;
-  --mission-surface-raised: #112640;
-  --mission-line: rgba(255, 255, 255, 0.1);
-  --mission-text: #f1f5f9;
-  --mission-muted: #94a3b8;
-  --mission-primary-start: #22d3ee;
-  --mission-primary-end: #0ea5e9;
-  --mission-on-primary: #031018;
-  --mission-defence: #60a5fa;
-  --mission-agriculture: #4ade80;
-  --mission-highlight: #fbbf24;
-  --mission-success: #34d399;
-  --mission-danger: #f87171;
+  --color-arctic: #F5F8FC;
+  --color-pure-white: #FFFFFF;
+  --color-midnight-navy: #101B2B;
+  --color-deep-navy: #080F1B;
+  --color-electric-cyan: #00C8E8;
+  --color-titanium: #AAB7C6;
+  --color-text-primary: #111827;
+  --color-text-secondary: #64748B;
+
+  --mission-bg: #080F1B;
+  --mission-bg-alt: #101B2B;
+  --mission-surface: #101B2B;
+  --mission-surface-raised: #162438;
+  --mission-line: rgba(170, 183, 198, 0.2);
+  --mission-text: #F5F8FC;
+  --mission-muted: #AAB7C6;
+  --mission-primary-start: #00C8E8;
+  --mission-primary-end: #55A8FF;
+  --mission-on-primary: #080F1B;
+  --mission-defence: #55A8FF;
+  --mission-agriculture: #34D399;
+  --mission-highlight: #FBBF24;
+  --mission-success: #34D399;
+  --mission-danger: #F87171;
 }
 
 @layer base {
@@ -45,30 +54,139 @@
 
 @layer components {
   .glass-card {
-    background-color: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    @apply backdrop-blur-xl;
+    background-color: rgba(16, 27, 43, 0.7);
+    border: 1px solid rgba(170, 183, 198, 0.2);
+    @apply backdrop-blur-xl shadow-glass;
   }
   .mission-surface {
     background-color: var(--mission-surface);
     border: 1px solid var(--mission-line);
   }
+  
+  /* Primary Button: Midnight Navy background, white text, cyan hover, 3D press */
   .btn-mission-primary {
-    background-image: linear-gradient(135deg, #22d3ee 0%, #0ea5e9 100%);
-    color: #031018;
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-[0_0_24px_rgba(34,211,238,0.35)] transition duration-200 hover:brightness-110 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 outline-none focus-visible:ring-2 focus-visible:ring-cyan-300;
+    position: relative;
+    overflow: hidden;
+    background-color: #101B2B;
+    border: 1px solid rgba(0, 200, 232, 0.4);
+    color: #FFFFFF;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-xs sm:text-sm font-bold uppercase tracking-wider shadow-[0_4px_20px_rgba(0,200,232,0.18)] transition-all duration-200 active:translate-y-[2px] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 outline-none focus-visible:ring-2 focus-visible:ring-[#00C8E8];
   }
+  .btn-mission-primary:hover {
+    border-color: #00C8E8;
+    background-color: #162438;
+    color: #FFFFFF;
+    box-shadow: 0 0 28px rgba(0, 200, 232, 0.4);
+  }
+
+  /* Secondary Button: White background, Navy text, fine border */
+  .btn-mission-secondary {
+    position: relative;
+    overflow: hidden;
+    background-color: #FFFFFF;
+    border: 1px solid #AAB7C6;
+    color: #101B2B;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wider shadow-sm transition-all duration-200 hover:border-[#101B2B] hover:shadow-md active:translate-y-[2px] active:scale-[0.98] outline-none focus-visible:ring-2 focus-visible:ring-[#101B2B];
+  }
+
+  /* Accent Button: Electric Cyan background, dark navy text, subtle glow */
+  .btn-mission-accent {
+    position: relative;
+    overflow: hidden;
+    background-color: #00C8E8;
+    color: #080F1B;
+    border: 1px solid transparent;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-xs sm:text-sm font-extrabold uppercase tracking-wider shadow-[0_0_24px_rgba(0,200,232,0.4)] transition-all duration-200 hover:brightness-105 hover:shadow-[0_0_35px_rgba(0,200,232,0.6)] active:translate-y-[2px] active:scale-[0.98] outline-none focus-visible:ring-2 focus-visible:ring-cyan-300;
+  }
+
+  /* Ghost / Outline Button */
   .btn-mission-ghost {
     background-color: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    color: #f1f5f9;
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wider backdrop-blur transition duration-200 hover:border-cyan-400/50 hover:bg-white/[0.08] hover:text-cyan-300 outline-none focus-visible:ring-2 focus-visible:ring-cyan-400;
+    border: 1px solid rgba(170, 183, 198, 0.25);
+    color: #F5F8FC;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-xs sm:text-sm font-semibold uppercase tracking-wider backdrop-blur transition-all duration-200 hover:border-[#00C8E8] hover:bg-white/[0.08] hover:text-[#00C8E8] active:translate-y-[2px] active:scale-[0.98] outline-none focus-visible:ring-2 focus-visible:ring-[#00C8E8];
+  }
+
+  /* Subtle shimmer keyframe utility */
+  .btn-shimmer::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+    animation: btnShimmer 5s infinite ease-in-out;
+    pointer-events: none;
+  }
+
+  @keyframes btnShimmer {
+    0%, 75% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
   }
   .hero-grid-overlay {
     background-image:
       linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
     background-size: 48px 48px;
+  }
+  .blueprint-grid {
+    background-image:
+      linear-gradient(to right, rgba(34, 211, 238, 0.08) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(34, 211, 238, 0.08) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+  .scanlines {
+    background: linear-gradient(
+      rgba(18, 16, 16, 0) 50%,
+      rgba(0, 0, 0, 0.35) 50%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+  }
+  .thermal-filter {
+    filter: sepia(0.85) hue-rotate(185deg) saturate(3.5) contrast(1.4) brightness(0.9);
+  }
+  .night-vision-filter {
+    filter: sepia(1) hue-rotate(75deg) saturate(4) contrast(1.5) brightness(1.1);
+  }
+  .ndvi-filter {
+    filter: invert(0.15) hue-rotate(95deg) saturate(3.8) contrast(1.35);
+  }
+  .hud-bracket {
+    position: relative;
+  }
+  .hud-bracket::before,
+  .hud-bracket::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-color: rgba(34, 211, 238, 0.5);
+    pointer-events: none;
+    transition: all 0.2s ease;
+  }
+  .hud-bracket::before {
+    top: -1px;
+    left: -1px;
+    border-top: 2px solid rgba(34, 211, 238, 0.6);
+    border-left: 2px solid rgba(34, 211, 238, 0.6);
+  }
+  .hud-bracket::after {
+    bottom: -1px;
+    right: -1px;
+    border-bottom: 2px solid rgba(34, 211, 238, 0.6);
+    border-right: 2px solid rgba(34, 211, 238, 0.6);
+  }
+  .hud-bracket:hover::before,
+  .hud-bracket:hover::after {
+    border-color: #22d3ee;
+    width: 14px;
+    height: 14px;
+  }
+  .telemetry-chip {
+    @apply inline-flex items-center gap-1.5 rounded border border-cyan-400/30 bg-[#050b14]/85 px-2 py-0.5 font-mono text-[10px] uppercase tracking-wider text-cyan-300;
   }
   .no-scrollbar::-webkit-scrollbar {
     display: none;

@@ -8,4 +8,14 @@ export { default as Magnetic } from './Magnetic';
 export { default as ScrollProgress } from './ScrollProgress';
 export { default as PageTransition } from './PageTransition';
 export { default as Carousel } from './Carousel';
+export {
+  default as Button,
+  PrimaryButton,
+  SecondaryButton,
+  AccentButton,
+  OutlineButton,
+  AnimatedIconButton,
+  CartButton,
+} from '@/components/ui/Button';
+
 

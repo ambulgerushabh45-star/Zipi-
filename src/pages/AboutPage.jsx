@@ -41,7 +41,7 @@ export default function AboutPage() {
         <Stagger className="grid gap-8 sm:grid-cols-3">
           <StaggerItem>
             <Tilt maxTilt={5} className="h-full">
-              <div className="h-full rounded-3xl border border-[#60a5fa]/30 bg-[#0b1a2c] p-8">
+              <div className="hud-bracket h-full rounded-3xl border border-[#60a5fa]/30 bg-[#0b1a2c] p-8 shadow-xl transition-all duration-300 hover:border-[#60a5fa] hover:shadow-[0_0_30px_rgba(96,165,250,0.2)]">
                 <Shield className="h-10 w-10 text-[#60a5fa]"/>
                 <h2 className="mt-6 font-display text-2xl font-bold text-[#f1f5f9]">Lawful Defence &amp; ISR</h2>
                 <p className="mt-3 text-sm text-[#94a3b8] leading-relaxed">
@@ -53,7 +53,7 @@ export default function AboutPage() {
 
           <StaggerItem>
             <Tilt maxTilt={5} className="h-full">
-              <div className="h-full rounded-3xl border border-[#4ade80]/30 bg-[#0b1a2c] p-8">
+              <div className="hud-bracket h-full rounded-3xl border border-[#4ade80]/30 bg-[#0b1a2c] p-8 shadow-xl transition-all duration-300 hover:border-[#4ade80] hover:shadow-[0_0_30px_rgba(74,222,128,0.2)]">
                 <Sprout className="h-10 w-10 text-[#4ade80]"/>
                 <h2 className="mt-6 font-display text-2xl font-bold text-[#f1f5f9]">Precision Agronomy</h2>
                 <p className="mt-3 text-sm text-[#94a3b8] leading-relaxed">
@@ -65,7 +65,7 @@ export default function AboutPage() {
 
           <StaggerItem>
             <Tilt maxTilt={5} className="h-full">
-              <div className="h-full rounded-3xl border border-cyan-400/30 bg-[#0b1a2c] p-8">
+              <div className="hud-bracket h-full rounded-3xl border border-cyan-400/30 bg-[#0b1a2c] p-8 shadow-xl transition-all duration-300 hover:border-cyan-400 hover:shadow-[0_0_30px_rgba(34,211,238,0.2)]">
                 <Compass className="h-10 w-10 text-[#22d3ee]"/>
                 <h2 className="mt-6 font-display text-2xl font-bold text-[#f1f5f9]">Industrial Reliability</h2>
                 <p className="mt-3 text-sm text-[#94a3b8] leading-relaxed">

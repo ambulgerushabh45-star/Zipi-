@@ -3,12 +3,11 @@ import react from '@vitejs/plugin-react';
 import { fileURLToPath, URL } from 'node:url';
 // https://vitejs.dev/config/
 export default defineConfig({
-    server: {
-        allowedHosts: ['.devtunnels.ms'],
-        hmr: {
-            clientPort: 443,
-        },
-    },
+  server: {
+    host: true,
+    port: 5173,
+    allowedHosts: true,
+  },
     plugins: [react()],
     resolve: {
         alias: {
@@ -16,6 +15,6 @@ export default defineConfig({
         },
     },
     optimizeDeps: {
-        exclude: ['lucide-react'],
+        include: ['lucide-react', 'framer-motion', 'react', 'react-dom', 'react-router-dom'],
     },
 });

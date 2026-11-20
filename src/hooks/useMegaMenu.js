@@ -1,19 +1,36 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 export function useMegaMenu() {
   const [activeId, setActiveId] = useState(null);
+  const timeoutRef = useRef(null);
 
-  const toggle = useCallback((id) => {
-    setActiveId((prev) => (prev === id ? null : id));
+  const clearTimer = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
   }, []);
 
   const open = useCallback((id) => {
+    clearTimer();
     setActiveId(id);
-  }, []);
+  }, [clearTimer]);
 
-  const close = useCallback(() => {
-    setActiveId(null);
-  }, []);
+  const close = useCallback((immediate = false) => {
+    clearTimer();
+    if (immediate) {
+      setActiveId(null);
+    } else {
+      timeoutRef.current = setTimeout(() => {
+        setActiveId(null);
+      }, 160);
+    }
+  }, [clearTimer]);
 
-  return { activeId, toggle, open, close };
+  const toggle = useCallback((id) => {
+    clearTimer();
+    setActiveId((prev) => (prev === id ? null : id));
+  }, [clearTimer]);
+
+  return { activeId, toggle, open, close, clearTimer };
 }

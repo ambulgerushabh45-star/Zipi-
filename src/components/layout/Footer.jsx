@@ -1,20 +1,40 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle2, Mail, Shield, Sprout } from 'lucide-react';
+import { CheckCircle2, Mail, Shield, Sprout, Radio, Terminal, Cpu } from 'lucide-react';
 import Logo from './Logo';
 import { CATEGORY_LABELS } from '@/data/products';
 
 const HARDWARE_CATEGORIES = ['uav-drones', 'controllers', 'gcs', 'avionics'];
 
-export default function Footer() {
+export default function Footer({ onReplayIntro }) {
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [zuluTime, setZuluTime] = useState('');
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setZuluTime(now.toISOString().slice(11, 19) + 'Z');
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleSubscribe = (e) => {
     e.preventDefault();
     if (!newsletterEmail.trim()) return;
     setSubscribed(true);
     setNewsletterEmail('');
+  };
+
+  const triggerReplay = () => {
+    if (onReplayIntro) {
+      onReplayIntro();
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('zipi:replay-intro'));
+    }
   };
 
   return (
@@ -142,16 +162,52 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-8 text-xs text-[#94a3b8] font-mono md:flex-row md:items-center">
+        {/* Mission Control System Telemetry Bar */}
+        <div className="mt-12 rounded-2xl border border-cyan-400/20 bg-[#07111f] p-4 font-mono text-[11px] text-slate-300">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <span className="flex items-center gap-1.5 text-cyan-300 font-bold">
+                <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#22d3ee]" />
+                <span>OPERATIONAL INTEGRITY: NOMINAL</span>
+              </span>
+              <span className="text-white/20 hidden sm:inline">|</span>
+              <span className="hidden sm:inline text-slate-400">
+                FREQUENCY-HOPPING AES-256 ENCRYPTED DATALINKS
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-slate-400">
+                ZULU CLOCK: <strong className="text-cyan-300">{zuluTime || '12:00:00Z'}</strong>
+              </span>
+              <span className="text-white/20">|</span>
+              <span className="rounded bg-cyan-400/10 px-2 py-0.5 text-cyan-300 font-bold border border-cyan-400/30">
+                DEFENCE ISR &amp; AGRI CERTIFIED
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 flex flex-col items-start justify-between gap-4 border-t border-white/10 pt-6 text-xs text-[#94a3b8] font-mono md:flex-row md:items-center">
           <p>
-            &copy; {new Date().getFullYear()} ZIPI Drones &amp; Controls. All rights reserved. Non-Weaponized ISR &amp; Agronomy Systems.
+            &copy; {new Date().getFullYear()} ZIPI Drones &amp; Controls. All rights reserved. Built exclusively for non-weaponized ISR and precision agriculture.
           </p>
-          <Link
-            to="/products"
-            className="text-cyan-300 transition hover:text-cyan-200 hover:underline"
-          >
-            Explore Complete Fleet
-          </Link>
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={triggerReplay}
+              className="text-[#00C8E8] transition hover:text-white hover:underline flex items-center gap-1.5 font-mono text-xs"
+              title="Replay ZIPI Cinematic Intro"
+            >
+              <span>↺</span>
+              <span>Replay Cinematic Intro</span>
+            </button>
+            <Link
+              to="/products"
+              className="text-cyan-300 transition hover:text-cyan-200 hover:underline"
+            >
+              Explore Complete Fleet &rarr;
+            </Link>
+          </div>
         </div>
       </div>
     </footer>
